@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Auto-Details</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f0f0f5; }
+        h1 { text-align: center; }
+        .details { max-width: 600px; margin: auto; background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        .details p { margin: 10px 0; }
+        button { margin-top: 20px; padding: 10px 20px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Auto-Details</h1>
+    <div class="details" id="details"></div>
+    <div style="text-align:center;"><button onclick="window.history.back()">Zurück</button></div>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const marke = params.get('marke');
+        const modell = params.get('modell');
+        const baujahr = params.get('baujahr');
+
+        const detailsDiv = document.getElementById('details');
+        detailsDiv.innerHTML = `
+            <p><strong>Marke:</strong> ${marke}</p>
+            <p><strong>Modell:</strong> ${modell}</p>
+            <p><strong>Baujahr:</strong> ${baujahr}</p>
+            <p><strong>PS:</strong> – (noch nicht hinzugefügt)</p>
+            <p><strong>Verbrauch:</strong> – (noch nicht hinzugefügt)</p>
+            <p><strong>Motor:</strong> – (noch nicht hinzugefügt)</p>
+        `;
+    </script>
+</body>
+</html>
