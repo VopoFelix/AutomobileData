@@ -121,7 +121,13 @@
       }
 
       currentResults = filtered; // Ergebnisse speichern
-      displayResults(currentResults);
+      currentResults = filtered;
+
+      // 👉 Default-Sortierung: Alphabetisch aufsteigend
+      document.getElementById("sortField").value = "alphabet";
+      document.getElementById("sortOrder").value = "asc";
+      applySorting(); 
+
     }
 
     function displayResults(list) {
