@@ -1,117 +1,64 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Fahrzeugdetails - Automobile-Data</title>
+  <title>Car Details</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f9f9f9;
-    }
-    h1 {
-      text-align: center;
-    }
-    .car-details {
-      max-width: 800px;
-      margin: 0 auto;
-      background: white;
-      padding: 20px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    }
-    .car-details h2 {
-      margin-top: 0;
-      text-align: center;
-    }
-    .category {
-      margin: 20px 0;
-      padding: 10px;
-      border-top: 1px solid #ddd;
-    }
-    .category h3 {
-      font-size: 1.1em;
-      margin-bottom: 8px;
-      color: #333;
-    }
-    .category ul {
-      list-style-type: none;
-      padding: 0;
-      margin: 0;
-    }
-    .category li {
-      margin: 4px 0;
-    }
-    .back-button {
-      display: block;
-      margin: 30px auto 0 auto;
-      padding: 10px 20px;
-      background-color: #ddd;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    .back-button:hover {
-      background-color: #bbb;
-    }
+    body { font-family: Arial, sans-serif; background:#f9f9f9; margin:0; padding:20px; }
+    .card { background:#fff; border:1px solid #ddd; border-radius:10px; padding:20px; width:300px; margin:auto; }
+    h2 { text-align:center; }
+    .section { margin-top:15px; }
+    .section h3 { margin:0 0 5px; border-bottom:1px solid #ddd; }
+    button { margin-top:20px; padding:8px 16px; border:none; background:#333; color:#fff; border-radius:5px; cursor:pointer; }
+    button:hover { background:#555; }
   </style>
 </head>
 <body>
-  <h1>Fahrzeugdetails</h1>
-  <div class="car-details" id="carDetails"></div>
-  <button class="back-button" onclick="goBack()">Zurück</button>
+  <div class="card" id="details"></div>
+  <div style="text-align:center;">
+    <button onclick="goBack()">Back</button>
+  </div>
 
-  <script src="autos.json"></script>
   <script>
-    function getQueryParams() {
-      const params = {};
-      window.location.search.substring(1).split("&").forEach(pair => {
-        const [key, value] = pair.split("=");
-        if (key) params[key] = decodeURIComponent(value || "");
-      });
-      return params;
+    async function loadCars(brand) {
+      const res = await fetch(`cars/${brand.toLowerCase()}.json`);
+      return await res.json();
     }
 
-    function renderCarDetails() {
-      const params = getQueryParams();
-      const carId = parseInt(params.id, 10);
-      const car = autos.find(a => a.id === carId);
+    function getParams() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        id: params.get("id"),
+        brand: params.get("brand")
+      };
+    }
 
-      if (!car) {
-        document.getElementById("carDetails").innerHTML = "<p>Auto nicht gefunden.</p>";
-        return;
-      }
-
-      let html = `<h2>${car.marke} ${car.modell} (${car.baujahr})</h2>`;
-
-      // Prüfen ob Kategorien existieren
-      if (car.kategorien) {
-        for (const [kategorie, details] of Object.entries(car.kategorien)) {
-          html += `<div class="category"><h3>${kategorie}</h3><ul>`;
-          for (const [key, value] of Object.entries(details)) {
-            html += `<li><strong>${key}:</strong> ${value}</li>`;
-          }
-          html += "</ul></div>";
-        }
-      } else {
-        html += `<div class="category"><h3>Allgemeine Daten</h3><ul>`;
-        for (const [key, value] of Object.entries(car)) {
-          if (key !== "id" && key !== "marke" && key !== "modell" && key !== "baujahr") {
-            html += `<li><strong>${key}:</strong> ${value}</li>`;
-          }
-        }
-        html += "</ul></div>`;
-      }
-
-      document.getElementById("carDetails").innerHTML = html;
+    function displayDetails(car) {
+      const div = document.getElementById("details");
+      div.innerHTML = `
+        <h2>${car.brand} ${car.model}</h2>
+        <div class="section">
+          <h3>Body</h3>
+          <p>Year: ${car.year}</p>
+        </div>
+        <div class="section">
+          <h3>Engine</h3>
+          <p>Fuel: ${car.fuel}</p>
+          <p>Horsepower: ${car.horsepower}</p>
+        </div>
+      `;
     }
 
     function goBack() {
-      history.back();
+      window.history.back();
     }
 
-    renderCarDetails();
+    (async function init() {
+      const { id, brand } = getParams();
+      const cars = await loadCars(brand);
+      const car = cars.find(c => c.id == id);
+      displayDetails(car);
+    })();
   </script>
 </body>
 </html>
