@@ -40,7 +40,7 @@
   {
     "id": 3,
     "marke": "Audi",
-    "modell": "A4",
+    "modell": "A6",
     "baujahr": 2021,
     "kraftstoff": "Benzin",
     "ps": "204",
@@ -76,3 +76,4 @@
     "bild": "bilder/vw_passat_2018.jpg"
   }
 ]
+
