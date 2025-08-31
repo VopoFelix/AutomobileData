@@ -72,14 +72,19 @@
             { 
                 id: 1, 
                 marke: "Audi", modell: "A4", baujahr: 2015, kraftstoff: "Benzin", ps: 150,
-                karosserie: { länge: "4726 mm", breite: "1842 mm", höhe: "1427 mm" },
-                motor: { hubraum: "1984 ccm", zylinder: 4, verbrauch: "6,5 l/100km" }
+                kategorien: {
+                    "Karosserie": { länge: "4726 mm", breite: "1842 mm", höhe: "1427 mm" },
+                    "Motor": { hubraum: "1984 ccm", zylinder: 4, verbrauch: "6,5 l/100km" },
+                    "Getriebe": { typ: "Manuell", gänge: 6 }
+                }
             },
             { 
                 id: 2, 
                 marke: "VW", modell: "Golf", baujahr: 2017, kraftstoff: "Benzin", ps: 110,
-                karosserie: { länge: "4255 mm", breite: "1799 mm", höhe: "1452 mm" },
-                motor: { hubraum: "1395 ccm", zylinder: 4, verbrauch: "5,2 l/100km" }
+                kategorien: {
+                    "Karosserie": { länge: "4255 mm", breite: "1799 mm", höhe: "1452 mm" },
+                    "Motor": { hubraum: "1395 ccm", zylinder: 4, verbrauch: "5,2 l/100km" }
+                }
             }
         ];
 
@@ -103,24 +108,24 @@
                 return;
             }
 
-            document.getElementById("details").innerHTML = `
+            let html = `
                 <h2>Allgemein</h2>
                 <div class="detail-item"><strong>Marke:</strong> ${car.marke}</div>
                 <div class="detail-item"><strong>Modell:</strong> ${car.modell}</div>
                 <div class="detail-item"><strong>Baujahr:</strong> ${car.baujahr}</div>
                 <div class="detail-item"><strong>Kraftstoff:</strong> ${car.kraftstoff}</div>
                 <div class="detail-item"><strong>Leistung:</strong> ${car.ps} PS</div>
-
-                <h2>Karosserie</h2>
-                <div class="detail-item"><strong>Länge:</strong> ${car.karosserie.länge}</div>
-                <div class="detail-item"><strong>Breite:</strong> ${car.karosserie.breite}</div>
-                <div class="detail-item"><strong>Höhe:</strong> ${car.karosserie.höhe}</div>
-
-                <h2>Motor</h2>
-                <div class="detail-item"><strong>Hubraum:</strong> ${car.motor.hubraum}</div>
-                <div class="detail-item"><strong>Zylinder:</strong> ${car.motor.zylinder}</div>
-                <div class="detail-item"><strong>Verbrauch:</strong> ${car.motor.verbrauch}</div>
             `;
+
+            // 🔥 Automatisch alle Kategorien durchlaufen
+            for (const [kategorie, werte] of Object.entries(car.kategorien)) {
+                html += `<h2>${kategorie}</h2>`;
+                for (const [key, value] of Object.entries(werte)) {
+                    html += `<div class="detail-item"><strong>${key}:</strong> ${value}</div>`;
+                }
+            }
+
+            document.getElementById("details").innerHTML = html;
         }
 
         function goBack() {
