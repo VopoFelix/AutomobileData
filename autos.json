@@ -1,6 +1,7 @@
 [
-  {"marke": "BMW", "modell": "3er", "baujahr": 2020, "ps": 150, "verbrauch": 6.5},
-  {"marke": "Audi", "modell": "A4", "baujahr": 2019, "ps": 190, "verbrauch": 7.2},
-  {"marke": "Mercedes", "modell": "C-Klasse", "baujahr": 2021, "ps": 180, "verbrauch": 6.8},
-  {"marke": "Volkswagen", "modell": "Golf", "baujahr": 2018, "ps": 130, "verbrauch": 5.9}
+    {"id": 1, "marke": "VW", "modell": "Golf", "baujahr": 2018, "ps": 110, "verbrauch": 5.8, "motor": "1.4 TSI"},
+    {"id": 2, "marke": "VW", "modell": "Golf", "baujahr": 2020, "ps": 130, "verbrauch": 5.6, "motor": "1.5 TSI"},
+    {"id": 3, "marke": "VW", "modell": "Passat", "baujahr": 2019, "ps": 150, "verbrauch": 6.2, "motor": "2.0 TDI"},
+    {"id": 4, "marke": "Audi", "modell": "A4", "baujahr": 2020, "ps": 190, "verbrauch": 6.5, "motor": "2.0 TFSI"},
+    {"id": 5, "marke": "BMW", "modell": "3er", "baujahr": 2019, "ps": 180, "verbrauch": 6.1, "motor": "2.0 Turbo"}
 ]
