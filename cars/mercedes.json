@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "brand": "Mercedes",
+    "model": "C200",
+    "year": 2019,
+    "fuel": "Diesel",
+    "horsepower": 160
+  },
+  {
+    "id": 2,
+    "brand": "Mercedes",
+    "model": "E200",
+    "year": 2020,
+    "fuel": "Petrol",
+    "horsepower": 184
+  }
+]
