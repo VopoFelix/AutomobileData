@@ -109,13 +109,26 @@
   <script>
     let currentResults = [];
 
-    function getQueryParams() {
-      const params = {};
-      window.location.search.substring(1).split("&").forEach(pair => {
-        const [key, value] = pair.split("=");
-        if (key) params[key] = decodeURIComponent(value || "");
-      });
-      return params;
+    function loadFiltersFromStorage() {
+      const saved = JSON.parse(localStorage.getItem("autoFilters") || "{}");
+      document.getElementById("marke").value = saved.marke || "";
+      document.getElementById("modell").value = saved.modell || "";
+      document.getElementById("baujahr").value = saved.baujahr || "";
+      document.getElementById("kraftstoff").value = saved.kraftstoff || "";
+      document.getElementById("sortField").value = saved.sortField || "alphabet";
+      document.getElementById("sortOrder").value = saved.sortOrder || "asc";
+    }
+
+    function saveFiltersToStorage() {
+      const filters = {
+        marke: document.getElementById("marke").value,
+        modell: document.getElementById("modell").value,
+        baujahr: document.getElementById("baujahr").value,
+        kraftstoff: document.getElementById("kraftstoff").value,
+        sortField: document.getElementById("sortField").value,
+        sortOrder: document.getElementById("sortOrder").value
+      };
+      localStorage.setItem("autoFilters", JSON.stringify(filters));
     }
 
     function renderResults() {
@@ -125,36 +138,20 @@
       // Filter anwenden
       if (document.getElementById("marke").value) {
         filtered = filtered.filter(a => a.marke.toLowerCase().includes(document.getElementById("marke").value.toLowerCase()));
-      } else if (params.marke) {
-        filtered = filtered.filter(a => a.marke.toLowerCase().includes(params.marke.toLowerCase()));
       }
-
       if (document.getElementById("modell").value) {
         filtered = filtered.filter(a => a.modell.toLowerCase().includes(document.getElementById("modell").value.toLowerCase()));
-      } else if (params.modell) {
-        filtered = filtered.filter(a => a.modell.toLowerCase().includes(params.modell.toLowerCase()));
       }
-
       if (document.getElementById("baujahr").value) {
         filtered = filtered.filter(a => String(a.baujahr) === document.getElementById("baujahr").value);
-      } else if (params.baujahr) {
-        filtered = filtered.filter(a => String(a.baujahr) === params.baujahr);
       }
-
       if (document.getElementById("kraftstoff").value) {
         filtered = filtered.filter(a => a.kraftstoff && a.kraftstoff.toLowerCase().includes(document.getElementById("kraftstoff").value.toLowerCase()));
-      } else if (params.kraftstoff) {
-        filtered = filtered.filter(a => a.kraftstoff && a.kraftstoff.toLowerCase().includes(params.kraftstoff.toLowerCase()));
       }
 
       currentResults = filtered;
 
-      // Default-Sortierung nur, wenn Dropdown auf nichts gesetzt ist
-      if (!document.getElementById("sortField").value) {
-        document.getElementById("sortField").value = "alphabet";
-        document.getElementById("sortOrder").value = "asc";
-      }
-
+      // Default-Sortierung anwenden
       applySorting();
     }
 
@@ -203,6 +200,7 @@
     }
 
     function viewDetails(id) {
+      saveFiltersToStorage(); // Filter vor Details speichern
       window.location.href = "details.html?id=" + id;
     }
 
@@ -210,7 +208,20 @@
       history.back();
     }
 
-    renderResults();
+    function getQueryParams() {
+      const params = {};
+      window.location.search.substring(1).split("&").forEach(pair => {
+        const [key, value] = pair.split("=");
+        if (key) params[key] = decodeURIComponent(value || "");
+      });
+      return params;
+    }
+
+    // Beim Laden Filter aus Storage wiederherstellen
+    window.onload = function() {
+      loadFiltersFromStorage();
+      renderResults();
+    }
   </script>
 </body>
 </html>
