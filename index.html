@@ -4,82 +4,19 @@
     <meta charset="UTF-8">
     <title>Automobile-Data</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
-        }
-
-        header {
-            background-color: #333;
-            color: white;
-            padding: 20px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-        }
-
-        .search-container {
-            display: flex;
-            justify-content: center;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 20px;
-        }
-
-        .search-container input {
-            padding: 8px;
-            font-size: 16px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .search-container button {
-            padding: 8px 15px;
-            font-size: 16px;
-            background-color: #333;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .search-container button:hover {
-            background-color: #555;
-        }
-
-        .brand-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 15px;
-            margin: 20px;
-        }
-
-        .brand-card {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #f2f2f2;
-            border: 1px solid #ccc;
-            padding: 20px;
-            font-size: 18px;
-            font-weight: bold;
-            text-decoration: none;
-            color: #333;
-            border-radius: 8px;
-            transition: background 0.3s;
-        }
-
-        .brand-card:hover {
-            background: #ddd;
-        }
+        body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f9f9f9; }
+        header { background:#333; color:white; padding:20px; text-align:center; font-size:24px; font-weight:bold; }
+        .search-container { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin:20px; }
+        .search-container input { padding:8px; font-size:16px; border:1px solid #ccc; border-radius:5px; }
+        .search-container button { padding:8px 15px; font-size:16px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer; }
+        .search-container button:hover { background:#555; }
+        .brand-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap:15px; margin:20px; }
+        .brand-card { background:white; border:1px solid #ccc; padding:20px; text-align:center; border-radius:8px; cursor:pointer; transition:background 0.3s; font-weight:bold; }
+        .brand-card:hover { background:#f0f0f0; }
     </style>
 </head>
 <body>
-    <header>
-        Automobile-Data
-    </header>
+    <header>Automobile-Data</header>
 
     <div class="search-container">
         <input type="text" id="marke" placeholder="Marke">
@@ -89,30 +26,59 @@
         <button onclick="search()">Suchen</button>
     </div>
 
-    <div class="brand-grid">
-        <a href="results.html?marke=Audi" class="brand-card">Audi</a>
-        <a href="results.html?marke=VW" class="brand-card">VW</a>
-        <a href="results.html?marke=BMW" class="brand-card">BMW</a>
-        <a href="results.html?marke=Mercedes" class="brand-card">Mercedes</a>
-        <!-- weitere Marken kannst du hier einfach ergänzen -->
-    </div>
+    <div class="brand-grid" id="brandGrid"></div>
 
     <script>
-        function search() {
+        const cars = [
+            { id:1, marke:"Audi", modell:"A6", baujahr:2021, kraftstoff:"Hybrid", ps:245 },
+            { id:2, marke:"VW", modell:"Golf", baujahr:2017, kraftstoff:"Benzin", ps:110 },
+            { id:3, marke:"BMW", modell:"320i", baujahr:2016, kraftstoff:"Benzin", ps:170 },
+            { id:4, marke:"Mercedes", modell:"C200", baujahr:2019, kraftstoff:"Diesel", ps:160 },
+            { id:5, marke:"Audi", modell:"Q5", baujahr:2020, kraftstoff:"Benzin", ps:249 },
+            { id:6, marke:"VW", modell:"Passat", baujahr:2018, kraftstoff:"Diesel", ps:190 },
+            { id:7, marke:"BMW", modell:"X3", baujahr:2021, kraftstoff:"Hybrid", ps:292 },
+            { id:8, marke:"Mercedes", modell:"E200", baujahr:2020, kraftstoff:"Benzin", ps:184 }
+        ];
+
+        function getUniqueBrands(){
+            const brands = [...new Set(cars.map(car => car.marke))];
+            return brands.sort();
+        }
+
+        function renderBrandGrid(){
+            const grid = document.getElementById("brandGrid");
+            grid.innerHTML="";
+            getUniqueBrands().forEach(brand=>{
+                const card = document.createElement("div");
+                card.className="brand-card";
+                card.textContent=brand;
+                card.onclick = ()=> filterByBrand(brand);
+                grid.appendChild(card);
+            });
+        }
+
+        function filterByBrand(brand){
+            // Weiterleitung zu results.html mit Marke als Parameter
+            const url = `results.html?marke=${encodeURIComponent(brand)}`;
+            window.location.href=url;
+        }
+
+        function search(){
             const marke = document.getElementById("marke").value;
             const modell = document.getElementById("modell").value;
             const baujahr = document.getElementById("baujahr").value;
             const kraftstoff = document.getElementById("kraftstoff").value;
 
-            // URL bauen mit Parametern
             const params = new URLSearchParams();
-            if (marke) params.append("marke", marke);
-            if (modell) params.append("modell", modell);
-            if (baujahr) params.append("baujahr", baujahr);
-            if (kraftstoff) params.append("kraftstoff", kraftstoff);
+            if(marke) params.append("marke", marke);
+            if(modell) params.append("modell", modell);
+            if(baujahr) params.append("baujahr", baujahr);
+            if(kraftstoff) params.append("kraftstoff", kraftstoff);
 
-            window.location.href = "results.html?" + params.toString();
+            window.location.href=`results.html?${params.toString()}`;
         }
+
+        renderBrandGrid();
     </script>
 </body>
 </html>
