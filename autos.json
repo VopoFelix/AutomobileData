@@ -1,0 +1,6 @@
+[
+  {"marke": "BMW", "modell": "3er", "baujahr": 2020, "ps": 150, "verbrauch": 6.5},
+  {"marke": "Audi", "modell": "A4", "baujahr": 2019, "ps": 190, "verbrauch": 7.2},
+  {"marke": "Mercedes", "modell": "C-Klasse", "baujahr": 2021, "ps": 180, "verbrauch": 6.8},
+  {"marke": "Volkswagen", "modell": "Golf", "baujahr": 2018, "ps": 130, "verbrauch": 5.9}
+]
