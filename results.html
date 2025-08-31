@@ -6,8 +6,9 @@
     <style>
         body { font-family: Arial, sans-serif; margin:20px; background-color:#f0f0f5; }
         header { background-color:#333; color:white; padding:20px; text-align:center; }
-        h1 { text-align:center; }
-        ul { list-style-type:none; padding:0; max-width:600px; margin:auto; }
+        .filter-bar { background-color:white; padding:20px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
+        select, button { padding:6px; }
+        ul { list-style-type:none; padding:0; max-width:800px; margin:auto; }
         li { background-color:white; margin:10px 0; padding:15px; border-radius:8px; cursor:pointer; box-shadow:0 0 5px rgba(0,0,0,0.1); }
         li:hover { background-color:#e0e0ff; }
     </style>
@@ -17,39 +18,106 @@
         <h1>Suchergebnisse</h1>
     </header>
 
+    <div class="filter-bar">
+        <select id="marke"><option value="">Marke</option></select>
+        <select id="modell"><option value="">Modell</option></select>
+        <select id="baujahr"><option value="">Baujahr</option></select>
+        <select id="kraftstoff"><option value="">Kraftstoffart</option></select>
+        <button id="filterBtn">Filtern</button>
+    </div>
+
     <ul id="results"></ul>
 
     <script>
-        const params = new URLSearchParams(window.location.search);
-        const marke = params.get('marke');
-        const modell = params.get('modell');
-        const baujahr = params.get('baujahr');
-        const kraftstoff = params.get('kraftstoff');
+        document.addEventListener('DOMContentLoaded', () => {
+            let autos = [];
 
-        fetch('autos.json')
-            .then(response => response.json())
-            .then(autos => {
-                const filtered = autos.filter(auto => {
-                    return (!marke || auto.marke.toLowerCase().includes(marke.toLowerCase()))
-                        && (!modell || auto.modell.toLowerCase().includes(modell.toLowerCase()))
-                        && (!baujahr || auto.baujahr == baujahr)
-                        && (!kraftstoff || auto.kraftstoff && auto.kraftstoff.toLowerCase().includes(kraftstoff.toLowerCase()));
-                });
+            const params = new URLSearchParams(window.location.search);
+            const markeSelect = document.getElementById('marke');
+            const modellSelect = document.getElementById('modell');
+            const baujahrSelect = document.getElementById('baujahr');
+            const kraftstoffSelect = document.getElementById('kraftstoff');
+            const resultsUl = document.getElementById('results');
+            const filterBtn = document.getElementById('filterBtn');
 
-                const ul = document.getElementById('results');
-                filtered.forEach(auto => {
-                    const li = document.createElement('li');
-                    li.textContent = `${auto.marke} ${auto.modell} (${auto.baujahr})`;
-                    li.onclick = () => {
-                        window.location.href = 'details.html?id=' + auto.id;
-                    };
-                    ul.appendChild(li);
-                });
+            fetch('autos.json')
+                .then(response => response.json())
+                .then(data => {
+                    autos = data;
 
-                if(filtered.length === 0) {
-                    ul.innerHTML = '<li>Keine Autos gefunden</li>';
-                }
+                    populateMarkenDropdown();
+                    applyInitialParams();
+                    renderResults();
+                })
+                .catch(err => console.error("Fehler beim Laden von autos.json:", err));
+
+            function populateMarkenDropdown() {
+                const marken = Array.from(new Set(autos.map(a => a.marke))).sort();
+                marken.forEach(m => markeSelect.add(new Option(m, m)));
+            }
+
+            function populateDependentDropdowns() {
+                const selectedMarke = markeSelect.value;
+                const filteredAutos = selectedMarke ? autos.filter(a => a.marke === selectedMarke) : autos;
+
+                // Modelle
+                modellSelect.innerHTML = '<option value="">Modell</option>';
+                Array.from(new Set(filteredAutos.map(a => a.modell))).sort().forEach(m => modellSelect.add(new Option(m, m)));
+
+                // Baujahr
+                baujahrSelect.innerHTML = '<option value="">Baujahr</option>';
+                Array.from(new Set(filteredAutos.map(a => a.baujahr))).sort((a,b)=>a-b).forEach(bj => baujahrSelect.add(new Option(bj, bj)));
+
+                // Kraftstoff
+                kraftstoffSelect.innerHTML = '<option value="">Kraftstoffart</option>';
+                Array.from(new Set(filteredAutos.map(a => a.kraftstoff).filter(k => k))).sort().forEach(k => kraftstoffSelect.add(new Option(k, k)));
+            }
+
+            markeSelect.addEventListener('change', () => {
+                populateDependentDropdowns();
             });
+
+            function applyInitialParams() {
+                const markeParam = params.get('marke') || "";
+                const modellParam = params.get('modell') || "";
+                const baujahrParam = params.get('baujahr') || "";
+                const kraftstoffParam = params.get('kraftstoff') || "";
+
+                markeSelect.value = markeParam;
+                populateDependentDropdowns();
+                modellSelect.value = modellParam;
+                baujahrSelect.value = baujahrParam;
+                kraftstoffSelect.value = kraftstoffParam;
+            }
+
+            function renderResults() {
+                const marke = markeSelect.value;
+                const modell = modellSelect.value;
+                const baujahr = baujahrSelect.value;
+                const kraftstoff = kraftstoffSelect.value;
+
+                const filtered = autos.filter(auto => {
+                    return (!marke || auto.marke === marke) &&
+                           (!modell || auto.modell === modell) &&
+                           (!baujahr || auto.baujahr == baujahr) &&
+                           (!kraftstoff || auto.kraftstoff === kraftstoff);
+                });
+
+                resultsUl.innerHTML = '';
+                if(filtered.length === 0) {
+                    resultsUl.innerHTML = '<li>Keine Autos gefunden</li>';
+                } else {
+                    filtered.forEach(auto => {
+                        const li = document.createElement('li');
+                        li.textContent = `${auto.marke} ${auto.modell} (${auto.baujahr})`;
+                        li.onclick = () => window.location.href = 'details.html?id=' + auto.id;
+                        resultsUl.appendChild(li);
+                    });
+                }
+            }
+
+            filterBtn.addEventListener('click', renderResults);
+        });
     </script>
 </body>
 </html>
