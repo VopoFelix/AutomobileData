@@ -1,97 +1,118 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>Automobile-Data</title>
-<style>
-    body { font-family: Arial, sans-serif; margin:0; background-color:#f0f0f5; }
-    header { background-color:#333; color:white; padding:20px; text-align:center; }
-    .search-bar { background-color:white; padding:20px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:10px; }
-    input, button { padding:6px; }
-    .brands-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:20px; margin:30px; }
-    .brand { background-color:white; padding:20px; text-align:center; border-radius:8px; cursor:pointer; box-shadow:0 0 5px rgba(0,0,0,0.1); }
-    .brand:hover { background-color:#e0e0ff; }
-</style>
+    <meta charset="UTF-8">
+    <title>Automobile-Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px;
+        }
+
+        .search-container input {
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .search-container button {
+            padding: 8px 15px;
+            font-size: 16px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .search-container button:hover {
+            background-color: #555;
+        }
+
+        .brand-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px;
+        }
+
+        .brand-card {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f2f2f2;
+            border: 1px solid #ccc;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            text-decoration: none;
+            color: #333;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .brand-card:hover {
+            background: #ddd;
+        }
+    </style>
 </head>
 <body>
-<header>
-    <h1>Automobile-Data</h1>
-</header>
+    <header>
+        Automobile-Data
+    </header>
 
-<div class="search-bar">
-    <input id="marke" placeholder="Marke">
-    <input id="modell" placeholder="Modell">
-    <input id="baujahr" placeholder="Baujahr">
-    <input id="kraftstoff" placeholder="Kraftstoffart">
-    <button id="searchBtn">Suchen</button>
-</div>
+    <div class="search-container">
+        <input type="text" id="marke" placeholder="Marke">
+        <input type="text" id="modell" placeholder="Modell">
+        <input type="text" id="baujahr" placeholder="Baujahr">
+        <input type="text" id="kraftstoff" placeholder="Kraftstoffart">
+        <button onclick="search()">Suchen</button>
+    </div>
 
-<div class="brands-grid" id="brandsGrid"></div>
+    <div class="brand-grid">
+        <a href="results.html?marke=Audi" class="brand-card">Audi</a>
+        <a href="results.html?marke=VW" class="brand-card">VW</a>
+        <a href="results.html?marke=BMW" class="brand-card">BMW</a>
+        <a href="results.html?marke=Mercedes" class="brand-card">Mercedes</a>
+        <!-- weitere Marken kannst du hier einfach ergänzen -->
+    </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    let autos = [];
+    <script>
+        function search() {
+            const marke = document.getElementById("marke").value;
+            const modell = document.getElementById("modell").value;
+            const baujahr = document.getElementById("baujahr").value;
+            const kraftstoff = document.getElementById("kraftstoff").value;
 
-    const markeInput = document.getElementById('marke');
-    const modellInput = document.getElementById('modell');
-    const baujahrInput = document.getElementById('baujahr');
-    const kraftstoffInput = document.getElementById('kraftstoff');
+            // URL bauen mit Parametern
+            const params = new URLSearchParams();
+            if (marke) params.append("marke", marke);
+            if (modell) params.append("modell", modell);
+            if (baujahr) params.append("baujahr", baujahr);
+            if (kraftstoff) params.append("kraftstoff", kraftstoff);
 
-    const brandsGrid = document.getElementById('brandsGrid');
-    const searchBtn = document.getElementById('searchBtn');
-
-    fetch('autos.json')
-        .then(response => response.json())
-        .then(data => {
-            autos = data;
-            populateBrandsGrid();
-        })
-        .catch(err => console.error("Fehler beim Laden von autos.json:", err));
-
-    function updateDependentFields() {
-        const selectedMarke = markeInput.value.toLowerCase();
-        const filteredAutos = selectedMarke ? autos.filter(a => a.marke.toLowerCase().includes(selectedMarke)) : autos;
-
-        // Modell
-        const modelle = Array.from(new Set(filteredAutos.map(a => a.modell))).sort();
-        modellInput.placeholder = modelle.length ? `z.B. ${modelle[0]}` : "Modell";
-
-        // Baujahr
-        const baujahre = Array.from(new Set(filteredAutos.map(a => a.baujahr))).sort((a,b)=>a-b);
-        baujahrInput.placeholder = baujahre.length ? `z.B. ${baujahre[0]}` : "Baujahr";
-
-        // Kraftstoff
-        const kraftstoffe = Array.from(new Set(filteredAutos.map(a => a.kraftstoff).filter(k=>k))).sort();
-        kraftstoffInput.placeholder = kraftstoffe.length ? `z.B. ${kraftstoffe[0]}` : "Kraftstoffart";
-    }
-
-    markeInput.addEventListener('input', updateDependentFields);
-
-    function populateBrandsGrid() {
-        const brands = Array.from(new Set(autos.map(a => a.marke))).sort();
-        brands.forEach(brand => {
-            const div = document.createElement('div');
-            div.className = 'brand';
-            div.textContent = brand;
-            div.onclick = () => {
-                markeInput.value = brand;
-                updateDependentFields();
-                searchBtn.click();
-            };
-            brandsGrid.appendChild(div);
-        });
-    }
-
-    searchBtn.addEventListener('click', () => {
-        const params = new URLSearchParams({
-            marke: markeInput.value,
-            modell: modellInput.value,
-            baujahr: baujahrInput.value,
-            kraftstoff: kraftstoffInput.value
-        });
-        window.location.href = 'results.html?' + params.toString();
-    });
-});
-</script>
+            window.location.href = "results.html?" + params.toString();
+        }
+    </script>
 </body>
 </html>
