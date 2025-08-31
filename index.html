@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <title>Automobile-Data</title>
     <style>
-        body { font-family: Sylfaen, Caladea; margin:0; padding:0; background:#f9f9f9; }
-        header { background:#333; color:white; padding:20px; text-align:center; font-size:24px; font-weight:bold; }
-        .search-container { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin:20px; }
-        .search-container input { padding:8px; font-size:16px; border:1px solid #ccc; border-radius:5px; }
-        .search-container button { padding:8px 15px; font-size:16px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer; }
+        body { font-family: Sylfaen, Caladea; margin:0; padding:0; background:#FFFFFF; }
+        header { background:#333; color:white; padding:48px; text-align:center; font-size:52px; font-weight:bold; }
+        .search-container { display:flex; justify-content:center; flex-wrap:wrap; gap:20px; margin:20px; }
+        .search-container input { padding:8px; font-size:24px; border:3px solid #ccc; border-radius:10px; }
+        .search-container button { padding:8px 15px; font-size:24px; background:#333; color:white; border:none; border-radius:10px; cursor:pointer; }
         .search-container button:hover { background:#555; }
-        .brand-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap:15px; margin:20px; }
-        .brand-card { background:white; border:1px solid #ccc; padding:20px; text-align:center; border-radius:8px; cursor:pointer; transition:background 0.3s; font-weight:bold; }
+        .brand-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(120px,1fr)); gap:20px; margin:50px; }
+        .brand-card { background:white; border:3px solid #ccc; padding:20px; text-align:center; font-size:24px; border-radius:8px; cursor:pointer; transition:background 0.3s; font-weight:bold; }
         .brand-card:hover { background:#f0f0f0; }
     </style>
 </head>
@@ -19,26 +19,16 @@
     <header>Automobile-Data</header>
 
     <div class="search-container">
-        <input type="text" id="marke" placeholder="Marke">
-        <input type="text" id="modell" placeholder="Modell">
-        <input type="text" id="baujahr" placeholder="Baujahr">
-        <input type="text" id="kraftstoff" placeholder="Kraftstoffart">
+        <input type="text" id="brand" placeholder="Marke">
+        <input type="text" id="model" placeholder="Modell">
+        <input type="text" id="construction_year" placeholder="Baujahr">
+        <input type="text" id="fuel_type" placeholder="Kraftstoffart">
         <button onclick="search()">Suchen</button>
     </div>
 
     <div class="brand-grid" id="brandGrid"></div>
 
     <script>
-        const cars = [
-            { id:1, marke:"Audi", modell:"A6", baujahr:2021, kraftstoff:"Hybrid", ps:245 },
-            { id:2, marke:"VW", modell:"Golf", baujahr:2017, kraftstoff:"Benzin", ps:110 },
-            { id:3, marke:"BMW", modell:"320i", baujahr:2016, kraftstoff:"Benzin", ps:170 },
-            { id:4, marke:"Mercedes", modell:"C200", baujahr:2019, kraftstoff:"Diesel", ps:160 },
-            { id:5, marke:"Audi", modell:"Q5", baujahr:2020, kraftstoff:"Benzin", ps:249 },
-            { id:6, marke:"VW", modell:"Passat", baujahr:2018, kraftstoff:"Diesel", ps:190 },
-            { id:7, marke:"BMW", modell:"X3", baujahr:2021, kraftstoff:"Hybrid", ps:292 },
-            { id:8, marke:"Mercedes", modell:"E200", baujahr:2020, kraftstoff:"Benzin", ps:184 }
-        ];
 
         function getUniqueBrands(){
             const brands = [...new Set(cars.map(car => car.marke))];
@@ -64,16 +54,16 @@
         }
 
         function search(){
-            const marke = document.getElementById("marke").value;
-            const modell = document.getElementById("modell").value;
-            const baujahr = document.getElementById("baujahr").value;
-            const kraftstoff = document.getElementById("kraftstoff").value;
+            const brand = document.getElementById("marke").value;
+            const model = document.getElementById("modell").value;
+            const construction_year = document.getElementById("baujahr").value;
+            const fuel_type = document.getElementById("kraftstoff").value;
 
             const params = new URLSearchParams();
-            if(marke) params.append("marke", marke);
-            if(modell) params.append("modell", modell);
-            if(baujahr) params.append("baujahr", baujahr);
-            if(kraftstoff) params.append("kraftstoff", kraftstoff);
+            if(brand) params.append("brand", brand);
+            if(model) params.append("model", model);
+            if(construction_year) params.append("construction_year", construction_year);
+            if(fuel_type) params.append("fuel_type", fuel_type);
 
             window.location.href=`results.html?${params.toString()}`;
         }
@@ -82,4 +72,5 @@
     </script>
 </body>
 </html>
+
 
