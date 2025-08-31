@@ -1,125 +1,258 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-  <meta charset="UTF-8">
-  <title>Suchergebnisse - Automobile-Data</title>
+  <meta charset="utf-8" />
+  <title>Automobile-Data — Suchergebnisse</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 20px;
-      background-color: #f9f9f9;
+    /* Gleiche Basis-Optik wie index.html */
+    body { font-family: Arial, sans-serif; margin:0; background:#f9f9f9; color:#222; }
+    header { background:#333; color:white; padding:18px 10px; text-align:center; font-size:22px; font-weight:700; }
+    .page { max-width:1100px; margin: 20px auto; padding: 0 12px; }
+
+    /* Suchleiste (gleich wie index) */
+    .search-bar {
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:center;
+      align-items:center;
+      margin-bottom:18px;
     }
-    h1 {
-      text-align: center;
+    .search-bar input[type="text"] {
+      padding:10px;
+      min-width:180px;
+      border:1px solid #ccc;
+      border-radius:6px;
+      font-size:14px;
     }
+    .search-bar button {
+      background:#333; color:#fff; border:none; padding:10px 14px; border-radius:6px; cursor:pointer;
+    }
+    .search-bar button:hover { background:#555; }
+
+    /* Controls (Sortierung) */
     .controls {
-      max-width: 900px;
-      margin: 20px auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: #fff;
-      padding: 10px;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:center;
+      margin-bottom:18px;
+      flex-wrap:wrap;
     }
-    .results {
-      max-width: 900px;
-      margin: 20px auto;
+    .controls select { padding:8px; border-radius:6px; border:1px solid #ccc; }
+
+    /* Ergebnis-Gitter */
+    .results-grid {
+      display:grid;
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+      gap:15px;
+      margin-bottom:24px;
     }
-    .car-card {
-      background: white;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      padding: 15px;
-      margin: 10px 0;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    .card {
+      background:#fff;
+      border:1px solid #e0e0e0;
+      border-radius:8px;
+      padding:14px;
+      box-shadow:0 2px 6px rgba(0,0,0,0.04);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
     }
-    .car-card h3 {
-      margin: 0 0 10px 0;
-    }
-    .car-card button {
-      margin-top: 10px;
-      padding: 8px 12px;
-      border: none;
-      background-color: #ddd;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    .car-card button:hover {
-      background-color: #bbb;
-    }
-    .back-button {
-      display: block;
-      margin: 30px auto;
-      padding: 10px 20px;
-      background-color: #ddd;
-      border: none;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    .back-button:hover {
-      background-color: #bbb;
-    }
-    .search-container input {
-      padding: 6px;
-      margin-right: 5px;
-    }
-    .search-container button {
-      padding: 6px 12px;
+    .card h3 { margin:0 0 8px 0; font-size:18px; }
+    .card p { margin:4px 0; font-size:14px; color:#444; }
+    .card .actions { margin-top:10px; display:flex; gap:8px; justify-content:flex-end; }
+    .btn { padding:8px 12px; border-radius:6px; border:none; cursor:pointer; background:#333; color:#fff; }
+    .btn.secondary { background:#eee; color:#222; border:1px solid #ccc; }
+    .btn.secondary:hover { background:#ddd; }
+
+    /* Zurück-Button */
+    .back { display:block; margin: 8px auto 40px auto; padding:10px 18px; border-radius:6px; background:#ddd; border:none; cursor:pointer; }
+    .back:hover { background:#ccc; }
+
+    /* Mobile spacing */
+    @media (max-width:520px){
+      .search-bar input[type="text"] { min-width:120px; }
     }
   </style>
 </head>
 <body>
-  <h1>Suchergebnisse</h1>
+  <header>Automobile-Data</header>
 
-  <!-- Suchfelder -->
-  <div class="controls search-container">
-    <input type="text" id="marke" placeholder="Marke">
-    <input type="text" id="modell" placeholder="Modell">
-    <input type="text" id="baujahr" placeholder="Baujahr">
-    <input type="text" id="kraftstoff" placeholder="Kraftstoffart">
-    <button onclick="renderResults()">Suchen</button>
-  </div>
-
-  <!-- Sortier-Steuerung -->
-  <div class="controls">
-    <div>
-      <label for="sortField"><strong>Sortieren nach:</strong></label>
-      <select id="sortField">
-        <option value="alphabet">Alphabet (Marke+Modell)</option>
-        <option value="baujahr">Baujahr</option>
-        <option value="ps">PS</option>
-      </select>
+  <main class="page">
+    <!-- Suchleiste -->
+    <div class="search-bar" role="search" aria-label="Filters">
+      <input type="text" id="marke" placeholder="Marke" />
+      <input type="text" id="modell" placeholder="Modell" />
+      <input type="text" id="baujahr" placeholder="Baujahr" />
+      <input type="text" id="kraftstoff" placeholder="Kraftstoffart" />
+      <button id="searchBtn">Suchen</button>
     </div>
-    <div>
-      <label for="sortOrder"><strong>Reihenfolge:</strong></label>
-      <select id="sortOrder">
-        <option value="asc">Aufsteigend</option>
-        <option value="desc">Absteigend</option>
-      </select>
+
+    <!-- Sortier-Steuerung -->
+    <div class="controls" aria-label="Sortierung">
+      <label>
+        <strong>Sortieren nach:</strong>
+        <select id="sortField">
+          <option value="alphabet">Alphabet (Marke + Modell)</option>
+          <option value="baujahr">Baujahr</option>
+          <option value="ps">PS</option>
+        </select>
+      </label>
+
+      <label>
+        <strong>Reihenfolge:</strong>
+        <select id="sortOrder">
+          <option value="asc">Aufsteigend</option>
+          <option value="desc">Absteigend</option>
+        </select>
+      </label>
+
+      <button id="applySortBtn" class="btn secondary">Sortieren</button>
     </div>
-    <button onclick="applySorting()">Sortieren</button>
-  </div>
 
-  <div class="results" id="results"></div>
-  <button class="back-button" onclick="goBack()">Zurück</button>
+    <!-- Ergebnisse -->
+    <section id="resultsSection">
+      <div id="results" class="results-grid" aria-live="polite"></div>
+    </section>
 
-  <script src="autos.js"></script>
+    <button class="back" onclick="history.back()">Zurück</button>
+  </main>
+
+  <!-- Deine Datenquelle: autos.js (wenn vorhanden). Fallback, falls nicht -->
   <script>
-    let currentResults = [];
+    // Falls du eine separate autos.js hast, wird window.autos verwendet.
+    // Wenn nicht vorhanden, wird hier ein kleines Beispiel-Array als Fallback verwendet.
+    const fallbackAutos = [
+      { id:1, marke:"Audi", modell:"A6", baujahr:2021, kraftstoff:"Hybrid", ps:245 },
+      { id:2, marke:"VW", modell:"Golf", baujahr:2017, kraftstoff:"Benzin", ps:110 },
+      { id:3, marke:"BMW", modell:"320i", baujahr:2016, kraftstoff:"Benzin", ps:170 },
+      { id:4, marke:"Mercedes", modell:"C200", baujahr:2019, kraftstoff:"Diesel", ps:160 },
+      { id:5, marke:"Audi", modell:"Q5", baujahr:2020, kraftstoff:"Benzin", ps:249 },
+      { id:6, marke:"VW", modell:"Passat", baujahr:2018, kraftstoff:"Diesel", ps:190 },
+      { id:7, marke:"BMW", modell:"X3", baujahr:2021, kraftstoff:"Hybrid", ps:292 },
+      { id:8, marke:"Mercedes", modell:"E200", baujahr:2020, kraftstoff:"Benzin", ps:184 }
+    ];
 
-    function loadFiltersFromStorage() {
-      const saved = JSON.parse(localStorage.getItem("autoFilters") || "{}");
-      document.getElementById("marke").value = saved.marke || "";
-      document.getElementById("modell").value = saved.modell || "";
-      document.getElementById("baujahr").value = saved.baujahr || "";
-      document.getElementById("kraftstoff").value = saved.kraftstoff || "";
-      document.getElementById("sortField").value = saved.sortField || "alphabet";
-      document.getElementById("sortOrder").value = saved.sortOrder || "asc";
+    // Wenn du autos.js einbindest, setze window.autos = [...];
+    // z.B. autos.js sollte `window.autos = [ {id:1,...}, ... ];`
+    const autos = window.autos && Array.isArray(window.autos) && window.autos.length ? window.autos : fallbackAutos;
+  </script>
+
+  <script>
+    // --- Utility: Query-Parameter parsen (URL hat Vorrang vor storage) ---
+    function getQueryParams() {
+      const params = {};
+      const qs = window.location.search.substring(1);
+      if (!qs) return params;
+      qs.split("&").forEach(pair => {
+        const [k, v] = pair.split("=");
+        if (k) params[decodeURIComponent(k)] = decodeURIComponent(v || "");
+      });
+      return params;
     }
 
-    function saveFiltersToStorage() {
+    // --- localStorage helpers (zum Merken der Filter) ---
+    function saveFiltersToStorage(filters) {
+      try { localStorage.setItem("autoFilters", JSON.stringify(filters)); } catch (e) { /* ignore */ }
+    }
+    function loadFiltersFromStorage() {
+      try { return JSON.parse(localStorage.getItem("autoFilters") || "{}"); }
+      catch(e){ return {}; }
+    }
+
+    // --- Rendering / Filter / Sort ---
+    let currentResults = [];
+
+    function applyFiltersFromInputsOrUrl() {
+      const params = getQueryParams();
+      const storage = loadFiltersFromStorage();
+
+      // Reihenfolge der Priorität: URL params > inputs already filled > storage defaults
+      const markeInput = document.getElementById("marke");
+      const modellInput = document.getElementById("modell");
+      const baujahrInput = document.getElementById("baujahr");
+      const kraftstoffInput = document.getElementById("kraftstoff");
+
+      // Set input values from URL if present, else if inputs already non-empty keep them, else from storage
+      if (params.marke !== undefined) markeInput.value = params.marke;
+      else if (!markeInput.value) markeInput.value = storage.marke || "";
+
+      if (params.modell !== undefined) modellInput.value = params.modell;
+      else if (!modellInput.value) modellInput.value = storage.modell || "";
+
+      if (params.baujahr !== undefined) baujahrInput.value = params.baujahr;
+      else if (!baujahrInput.value) baujahrInput.value = storage.baujahr || "";
+
+      if (params.kraftstoff !== undefined) kraftstoffInput.value = params.kraftstoff;
+      else if (!kraftstoffInput.value) kraftstoffInput.value = storage.kraftstoff || "";
+    }
+
+    function filterCars() {
+      const marke = document.getElementById("marke").value.trim().toLowerCase();
+      const modell = document.getElementById("modell").value.trim().toLowerCase();
+      const baujahr = document.getElementById("baujahr").value.trim();
+      const kraftstoff = document.getElementById("kraftstoff").value.trim().toLowerCase();
+
+      return autos.filter(a => {
+        if (marke && !(a.marke && a.marke.toLowerCase().includes(marke))) return false;
+        if (modell && !(a.modell && a.modell.toLowerCase().includes(modell))) return false;
+        if (baujahr && String(a.baujahr) !== baujahr) return false;
+        if (kraftstoff && !(a.kraftstoff && a.kraftstoff.toLowerCase().includes(kraftstoff))) return false;
+        return true;
+      });
+    }
+
+    function displayResults(list) {
+      const container = document.getElementById("results");
+      container.innerHTML = "";
+      if (!list || list.length === 0) {
+        container.innerHTML = `<div style="grid-column:1/-1;padding:20px;text-align:center;background:#fff;border:1px solid #eee;border-radius:8px">Keine Ergebnisse gefunden.</div>`;
+        return;
+      }
+
+      list.forEach(car => {
+        const card = document.createElement("article");
+        card.className = "card";
+        card.innerHTML = `
+          <div>
+            <h3>${escapeHtml(car.marke || "-")} ${escapeHtml(car.modell || "")}</h3>
+            <p><strong>Baujahr:</strong> ${escapeHtml(String(car.baujahr || "-"))}</p>
+            <p><strong>PS:</strong> ${escapeHtml(String(car.ps || "-"))}</p>
+            <p><strong>Kraftstoff:</strong> ${escapeHtml(car.kraftstoff || "-")}</p>
+          </div>
+          <div class="actions">
+            <button class="btn secondary" onclick="viewDetails(${encodeURIComponent(car.id)})">Details</button>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // safe HTML escape for inserted text
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    function applySortingAndDisplay() {
+      const field = document.getElementById("sortField").value;
+      const order = document.getElementById("sortOrder").value;
+      let list = [...currentResults];
+
+      if (field === "alphabet") {
+        list.sort((a,b) => ( (a.marke||"") + " " + (a.modell||"") ).localeCompare( (b.marke||"") + " " + (b.modell||"") );
+      } else if (field === "baujahr") {
+        list.sort((a,b) => (Number(a.baujahr) || 0) - (Number(b.baujahr) || 0));
+      } else if (field === "ps") {
+        list.sort((a,b) => (Number(a.ps) || 0) - (Number(b.ps) || 0));
+      }
+
+      if (order === "desc") list.reverse();
+      displayResults(list);
+    }
+
+    // wenn auf Details geklickt: Filter speichern damit beim Zurückkehren Zustand erhalten bleibt
+    function viewDetails(id) {
       const filters = {
         marke: document.getElementById("marke").value,
         modell: document.getElementById("modell").value,
@@ -128,100 +261,56 @@
         sortField: document.getElementById("sortField").value,
         sortOrder: document.getElementById("sortOrder").value
       };
-      localStorage.setItem("autoFilters", JSON.stringify(filters));
+      saveFiltersToStorage(filters);
+      // Weiterleiten zur detailseite
+      window.location.href = "details.html?id=" + encodeURIComponent(id);
     }
 
-    function renderResults() {
-      const params = getQueryParams();
-      let filtered = autos;
+    // Hook: Suchen-Button
+    document.addEventListener("DOMContentLoaded", () => {
+      // 1) Lade Filterwerte (URL hat Vorrang)
+      applyFiltersFromInputsOrUrl();
 
-      // Filter anwenden
-      if (document.getElementById("marke").value) {
-        filtered = filtered.filter(a => a.marke.toLowerCase().includes(document.getElementById("marke").value.toLowerCase()));
+      // 2) Initial filtern
+      currentResults = filterCars();
+
+      // 3) Default sortierung: wenn keine Einstellung in storage/URL gewählt -> alphabet asc
+      const storage = loadFiltersFromStorage();
+      if (!getQueryParams().hasOwnProperty("marke") && !getQueryParams().hasOwnProperty("modell") && !getQueryParams().hasOwnProperty("baujahr") && !getQueryParams().hasOwnProperty("kraftstoff")) {
+        // nur wenn keine url-filter gesetzt -> wir zeigen alle autos (filtered = all) - but still apply default sorting
       }
-      if (document.getElementById("modell").value) {
-        filtered = filtered.filter(a => a.modell.toLowerCase().includes(document.getElementById("modell").value.toLowerCase()));
-      }
-      if (document.getElementById("baujahr").value) {
-        filtered = filtered.filter(a => String(a.baujahr) === document.getElementById("baujahr").value);
-      }
-      if (document.getElementById("kraftstoff").value) {
-        filtered = filtered.filter(a => a.kraftstoff && a.kraftstoff.toLowerCase().includes(document.getElementById("kraftstoff").value.toLowerCase()));
-      }
+      // set defaults from storage if present (but URL > storage already handled earlier)
+      document.getElementById("sortField").value = storage.sortField || "alphabet";
+      document.getElementById("sortOrder").value = storage.sortOrder || "asc";
 
-      currentResults = filtered;
+      // render initial results (currentResults was set by filterCars)
+      displayResults([]); // kurz leeren für flackerfrei
+      currentResults = filterCars();
+      applySortingAndDisplay();
 
-      // Default-Sortierung anwenden
-      applySorting();
-    }
-
-    function displayResults(list) {
-      const container = document.getElementById("results");
-      container.innerHTML = "";
-
-      if (list.length === 0) {
-        container.innerHTML = "<p>Keine Ergebnisse gefunden.</p>";
-        return;
-      }
-
-      list.forEach(car => {
-        const card = document.createElement("div");
-        card.className = "car-card";
-        card.innerHTML = `
-          <h3>${car.marke} ${car.modell}</h3>
-          <p><strong>Baujahr:</strong> ${car.baujahr || "-"}</p>
-          <p><strong>PS:</strong> ${car.ps || "-"}</p>
-          <p><strong>Kraftstoff:</strong> ${car.kraftstoff || "-"}</p>
-          <button onclick="viewDetails(${car.id})">Details ansehen</button>
-        `;
-        container.appendChild(card);
+      // Event listeners
+      document.getElementById("searchBtn").addEventListener("click", () => {
+        currentResults = filterCars();
+        applySortingAndDisplay();
       });
-    }
-
-    function applySorting() {
-      const field = document.getElementById("sortField").value;
-      const order = document.getElementById("sortOrder").value;
-
-      let sorted = [...currentResults];
-
-      if (field === "alphabet") {
-        sorted.sort((a, b) => (a.marke + " " + a.modell).localeCompare(b.marke + " " + b.modell));
-      } else if (field === "baujahr") {
-        sorted.sort((a, b) => (a.baujahr || 0) - (b.baujahr || 0));
-      } else if (field === "ps") {
-        sorted.sort((a, b) => (a.ps || 0) - (b.ps || 0));
-      }
-
-      if (order === "desc") {
-        sorted.reverse();
-      }
-
-      displayResults(sorted);
-    }
-
-    function viewDetails(id) {
-      saveFiltersToStorage(); // Filter vor Details speichern
-      window.location.href = "details.html?id=" + id;
-    }
-
-    function goBack() {
-      history.back();
-    }
-
-    function getQueryParams() {
-      const params = {};
-      window.location.search.substring(1).split("&").forEach(pair => {
-        const [key, value] = pair.split("=");
-        if (key) params[key] = decodeURIComponent(value || "");
+      document.getElementById("applySortBtn").addEventListener("click", () => {
+        // speichern gewählter Sortierung
+        const f = { sortField: document.getElementById("sortField").value, sortOrder: document.getElementById("sortOrder").value };
+        saveFiltersToStorage(Object.assign(loadFiltersFromStorage(), f));
+        applySortingAndDisplay();
       });
-      return params;
-    }
 
-    // Beim Laden Filter aus Storage wiederherstellen
-    window.onload = function() {
-      loadFiltersFromStorage();
-      renderResults();
-    }
+      // Enter drücken in einem Input startet Suche
+      ['marke','modell','baujahr','kraftstoff'].forEach(id=>{
+        document.getElementById(id).addEventListener("keydown", (e)=>{
+          if(e.key === "Enter") {
+            e.preventDefault();
+            currentResults = filterCars();
+            applySortingAndDisplay();
+          }
+        });
+      });
+    });
   </script>
 </body>
 </html>
