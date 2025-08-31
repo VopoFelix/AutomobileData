@@ -19,6 +19,7 @@
             padding: 8px 12px;
             border: 1px solid #ccc;
             text-align: left;
+            cursor: pointer;
         }
         th { background-color: #eee; }
         input {
@@ -35,45 +36,74 @@
     <table id="autoTable">
         <thead>
             <tr>
-                <th>Marke</th>
-                <th>Modell</th>
-                <th>Baujahr</th>
-                <th>PS</th>
-                <th>Verbrauch (l/100km)</th>
+                <th onclick="sortTable(0)">Marke &#x25B2;&#x25BC;</th>
+                <th onclick="sortTable(1)">Modell &#x25B2;&#x25BC;</th>
+                <th onclick="sortTable(2)">Baujahr &#x25B2;&#x25BC;</th>
+                <th onclick="sortTable(3)">PS &#x25B2;&#x25BC;</th>
+                <th onclick="sortTable(4)">Verbrauch (l/100km) &#x25B2;&#x25BC;</th>
             </tr>
         </thead>
-        <tbody>
-        </tbody>
+        <tbody></tbody>
     </table>
 
     <script>
+        let autoData = [];
+
         // JSON-Datei laden
         fetch('autos.json')
             .then(response => response.json())
             .then(data => {
-                const tbody = document.querySelector('#autoTable tbody');
-                data.forEach(auto => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${auto.marke}</td>
-                        <td>${auto.modell}</td>
-                        <td>${auto.baujahr}</td>
-                        <td>${auto.ps}</td>
-                        <td>${auto.verbrauch}</td>
-                    `;
-                    tbody.appendChild(row);
-                });
+                autoData = data;
+                displayTable(autoData);
             });
+
+        // Tabelle anzeigen
+        function displayTable(data) {
+            const tbody = document.querySelector('#autoTable tbody');
+            tbody.innerHTML = '';
+            data.forEach(auto => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${auto.marke}</td>
+                    <td>${auto.modell}</td>
+                    <td>${auto.baujahr}</td>
+                    <td>${auto.ps}</td>
+                    <td>${auto.verbrauch}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
 
         // Suchfunktion
         function filterTable() {
             const input = document.getElementById('search').value.toLowerCase();
-            const rows = document.querySelectorAll('#autoTable tbody tr');
-            rows.forEach(row => {
-                const marke = row.cells[0].textContent.toLowerCase();
-                const modell = row.cells[1].textContent.toLowerCase();
-                row.style.display = (marke.includes(input) || modell.includes(input)) ? '' : 'none';
+            const filtered = autoData.filter(auto =>
+                auto.marke.toLowerCase().includes(input) ||
+                auto.modell.toLowerCase().includes(input)
+            );
+            displayTable(filtered);
+        }
+
+        // Sortierfunktion
+        let sortDirections = [true, true, true, true, true]; // aufsteigend = true
+        function sortTable(colIndex) {
+            sortDirections[colIndex] = !sortDirections[colIndex];
+            autoData.sort((a, b) => {
+                let valA, valB;
+                switch(colIndex) {
+                    case 0: valA = a.marke; valB = b.marke; break;
+                    case 1: valA = a.modell; valB = b.modell; break;
+                    case 2: valA = a.baujahr; valB = b.baujahr; break;
+                    case 3: valA = a.ps; valB = b.ps; break;
+                    case 4: valA = a.verbrauch; valB = b.verbrauch; break;
+                }
+                if (typeof valA === 'string') valA = valA.toLowerCase();
+                if (typeof valB === 'string') valB = valB.toLowerCase();
+                if(valA < valB) return sortDirections[colIndex] ? -1 : 1;
+                if(valA > valB) return sortDirections[colIndex] ? 1 : -1;
+                return 0;
             });
+            displayTable(autoData);
         }
     </script>
 </body>
