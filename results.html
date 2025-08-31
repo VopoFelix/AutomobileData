@@ -12,9 +12,20 @@
     h1 {
       text-align: center;
     }
+    .controls {
+      max-width: 900px;
+      margin: 20px auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
     .results {
       max-width: 900px;
-      margin: 0 auto;
+      margin: 20px auto;
     }
     .car-card {
       background: white;
@@ -54,11 +65,34 @@
 </head>
 <body>
   <h1>Suchergebnisse</h1>
+
+  <!-- Sortier-Steuerung -->
+  <div class="controls">
+    <div>
+      <label for="sortField"><strong>Sortieren nach:</strong></label>
+      <select id="sortField">
+        <option value="alphabet">Alphabet (Marke+Modell)</option>
+        <option value="baujahr">Baujahr</option>
+        <option value="ps">PS</option>
+      </select>
+    </div>
+    <div>
+      <label for="sortOrder"><strong>Reihenfolge:</strong></label>
+      <select id="sortOrder">
+        <option value="asc">Aufsteigend</option>
+        <option value="desc">Absteigend</option>
+      </select>
+    </div>
+    <button onclick="applySorting()">Sortieren</button>
+  </div>
+
   <div class="results" id="results"></div>
   <button class="back-button" onclick="goBack()">Zurück</button>
 
   <script src="autos.js"></script>
   <script>
+    let currentResults = [];
+
     function getQueryParams() {
       const params = {};
       window.location.search.substring(1).split("&").forEach(pair => {
@@ -72,7 +106,7 @@
       const params = getQueryParams();
       let filtered = autos;
 
-      // Filter anwenden (nur wenn Parameter gesetzt sind)
+      // Filter anwenden
       if (params.marke) {
         filtered = filtered.filter(a => a.marke.toLowerCase().includes(params.marke.toLowerCase()));
       }
@@ -86,19 +120,23 @@
         filtered = filtered.filter(a => a.kraftstoff && a.kraftstoff.toLowerCase().includes(params.kraftstoff.toLowerCase()));
       }
 
+      currentResults = filtered; // Ergebnisse speichern
+      displayResults(currentResults);
+    }
+
+    function displayResults(list) {
       const container = document.getElementById("results");
       container.innerHTML = "";
 
-      if (filtered.length === 0) {
+      if (list.length === 0) {
         container.innerHTML = "<p>Keine Ergebnisse gefunden.</p>";
         return;
       }
 
-      filtered.forEach(car => {
+      list.forEach(car => {
         const card = document.createElement("div");
         card.className = "car-card";
 
-        // Zeige nur Basisinfos
         card.innerHTML = `
           <h3>${car.marke} ${car.modell}</h3>
           <p><strong>Baujahr:</strong> ${car.baujahr || "-"}</p>
@@ -109,6 +147,31 @@
 
         container.appendChild(card);
       });
+    }
+
+    function applySorting() {
+      const field = document.getElementById("sortField").value;
+      const order = document.getElementById("sortOrder").value;
+
+      let sorted = [...currentResults];
+
+      if (field === "alphabet") {
+        sorted.sort((a, b) => {
+          const nameA = (a.marke + " " + a.modell).toLowerCase();
+          const nameB = (b.marke + " " + b.modell).toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+      } else if (field === "baujahr") {
+        sorted.sort((a, b) => (a.baujahr || 0) - (b.baujahr || 0));
+      } else if (field === "ps") {
+        sorted.sort((a, b) => (a.ps || 0) - (b.ps || 0));
+      }
+
+      if (order === "desc") {
+        sorted.reverse();
+      }
+
+      displayResults(sorted);
     }
 
     function viewDetails(id) {
