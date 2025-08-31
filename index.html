@@ -2,14 +2,13 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Auto-Suche</title>
+    <title>Automobile-Data</title>
 </head>
 <body>
-    <h1>Auto-Suche</h1>
+    <h1>Automobile-Data</h1>
     <label>Marke: <input type="text" id="marke" placeholder="z.B. VW"></label><br>
     <label>Modell: <input type="text" id="modell" placeholder="z.B. Golf"></label><br>
     <label>Baujahr: <input type="text" id="baujahr" placeholder="optional"></label><br>
-    <label>PS: <input type="text" id="ps" placeholder="optional"></label><br>
     <button onclick="searchAuto()">Suchen</button>
 
     <script>
@@ -17,7 +16,6 @@
             const marke = document.getElementById('marke').value;
             const modell = document.getElementById('modell').value;
             const baujahr = document.getElementById('baujahr').value;
-            const ps = document.getElementById('ps').value;
 
             const params = new URLSearchParams({ marke, modell, baujahr, ps });
             window.location.href = 'results.html?' + params.toString();
@@ -25,3 +23,4 @@
     </script>
 </body>
 </html>
+
