@@ -31,7 +31,7 @@
     <script>
 
         function getUniqueBrands(){
-            const brands = [...new Set(cars.map(car => car.marke))];
+            const brands = [...new Set(cars.map(car => car.brand))];
             return brands.sort();
         }
 
@@ -48,16 +48,15 @@
         }
 
         function filterByBrand(brand){
-            // Weiterleitung zu results.html mit Marke als Parameter
-            const url = `results.html?marke=${encodeURIComponent(brand)}`;
+            const url = `results.html?brand=${encodeURIComponent(brand)}`;
             window.location.href=url;
         }
 
         function search(){
-            const brand = document.getElementById("marke").value;
-            const model = document.getElementById("modell").value;
-            const construction_year = document.getElementById("baujahr").value;
-            const fuel_type = document.getElementById("kraftstoff").value;
+            const brand = document.getElementById("brand").value;
+            const model = document.getElementById("model").value;
+            const construction_year = document.getElementById("construction_year").value;
+            const fuel_type = document.getElementById("fuel_type").value;
 
             const params = new URLSearchParams();
             if(brand) params.append("brand", brand);
@@ -72,5 +71,6 @@
     </script>
 </body>
 </html>
+
 
 
