@@ -61,10 +61,26 @@
     .back-button:hover {
       background-color: #bbb;
     }
+    .search-container input {
+      padding: 6px;
+      margin-right: 5px;
+    }
+    .search-container button {
+      padding: 6px 12px;
+    }
   </style>
 </head>
 <body>
   <h1>Suchergebnisse</h1>
+
+  <!-- Suchfelder -->
+  <div class="controls search-container">
+    <input type="text" id="marke" placeholder="Marke">
+    <input type="text" id="modell" placeholder="Modell">
+    <input type="text" id="baujahr" placeholder="Baujahr">
+    <input type="text" id="kraftstoff" placeholder="Kraftstoffart">
+    <button onclick="renderResults()">Suchen</button>
+  </div>
 
   <!-- Sortier-Steuerung -->
   <div class="controls">
@@ -107,27 +123,39 @@
       let filtered = autos;
 
       // Filter anwenden
-      if (params.marke) {
+      if (document.getElementById("marke").value) {
+        filtered = filtered.filter(a => a.marke.toLowerCase().includes(document.getElementById("marke").value.toLowerCase()));
+      } else if (params.marke) {
         filtered = filtered.filter(a => a.marke.toLowerCase().includes(params.marke.toLowerCase()));
       }
-      if (params.modell) {
+
+      if (document.getElementById("modell").value) {
+        filtered = filtered.filter(a => a.modell.toLowerCase().includes(document.getElementById("modell").value.toLowerCase()));
+      } else if (params.modell) {
         filtered = filtered.filter(a => a.modell.toLowerCase().includes(params.modell.toLowerCase()));
       }
-      if (params.baujahr) {
+
+      if (document.getElementById("baujahr").value) {
+        filtered = filtered.filter(a => String(a.baujahr) === document.getElementById("baujahr").value);
+      } else if (params.baujahr) {
         filtered = filtered.filter(a => String(a.baujahr) === params.baujahr);
       }
-      if (params.kraftstoff) {
+
+      if (document.getElementById("kraftstoff").value) {
+        filtered = filtered.filter(a => a.kraftstoff && a.kraftstoff.toLowerCase().includes(document.getElementById("kraftstoff").value.toLowerCase()));
+      } else if (params.kraftstoff) {
         filtered = filtered.filter(a => a.kraftstoff && a.kraftstoff.toLowerCase().includes(params.kraftstoff.toLowerCase()));
       }
 
-      currentResults = filtered; // Ergebnisse speichern
       currentResults = filtered;
 
-      // 👉 Default-Sortierung: Alphabetisch aufsteigend
-      document.getElementById("sortField").value = "alphabet";
-      document.getElementById("sortOrder").value = "asc";
-      applySorting(); 
+      // Default-Sortierung nur, wenn Dropdown auf nichts gesetzt ist
+      if (!document.getElementById("sortField").value) {
+        document.getElementById("sortField").value = "alphabet";
+        document.getElementById("sortOrder").value = "asc";
+      }
 
+      applySorting();
     }
 
     function displayResults(list) {
@@ -142,7 +170,6 @@
       list.forEach(car => {
         const card = document.createElement("div");
         card.className = "car-card";
-
         card.innerHTML = `
           <h3>${car.marke} ${car.modell}</h3>
           <p><strong>Baujahr:</strong> ${car.baujahr || "-"}</p>
@@ -150,7 +177,6 @@
           <p><strong>Kraftstoff:</strong> ${car.kraftstoff || "-"}</p>
           <button onclick="viewDetails(${car.id})">Details ansehen</button>
         `;
-
         container.appendChild(card);
       });
     }
@@ -162,11 +188,7 @@
       let sorted = [...currentResults];
 
       if (field === "alphabet") {
-        sorted.sort((a, b) => {
-          const nameA = (a.marke + " " + a.modell).toLowerCase();
-          const nameB = (b.marke + " " + b.modell).toLowerCase();
-          return nameA.localeCompare(nameB);
-        });
+        sorted.sort((a, b) => (a.marke + " " + a.modell).localeCompare(b.marke + " " + b.modell));
       } else if (field === "baujahr") {
         sorted.sort((a, b) => (a.baujahr || 0) - (b.baujahr || 0));
       } else if (field === "ps") {
