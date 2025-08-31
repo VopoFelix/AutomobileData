@@ -3,7 +3,8 @@
     {"id":2,"marke":"VW","modell":"Golf","baujahr":2020,"ps":130,"verbrauch":5.6,"motor":"1.5 TSI","kraftstoff":"Benzin"},
     {"id":3,"marke":"VW","modell":"Passat","baujahr":2019,"ps":150,"verbrauch":6.2,"motor":"2.0 TDI","kraftstoff":"Diesel"},
     {"id":4,"marke":"Audi","modell":"A4","baujahr":2020,"ps":190,"verbrauch":6.5,"motor":"2.0 TFSI","kraftstoff":"Benzin"},
-    {"id":5,"marke":"BMW","modell":"3er","baujahr":2019,"ps":180,"verbrauch":6.1,"motor":"2.0 Turbo","kraftstoff":"Benzin","bild":"placeholder.png"}
+    {"id":5,"marke":"BMW","modell":"3er","baujahr":2019,"ps":180,"verbrauch":6.1,"motor":"2.0 Turbo","kraftstoff":"Benzin","bild":"bild/placeholder.png"}
     
 ]
+
 
