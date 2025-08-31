@@ -4,178 +4,152 @@
     <meta charset="UTF-8">
     <title>Suchergebnisse - Automobile-Data</title>
     <style>
-        body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f9f9f9; }
-        header { background:#333; color:white; padding:20px; text-align:center; font-size:24px; font-weight:bold; }
-        .search-container { display:flex; justify-content:center; flex-wrap:wrap; gap:10px; margin:20px; }
-        .search-container input { padding:8px; font-size:16px; border:1px solid #ccc; border-radius:5px; }
-        .search-container button { padding:8px 15px; font-size:16px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer; }
-        .search-container button:hover { background:#555; }
-        .sort-buttons { display:flex; justify-content:center; gap:15px; margin:10px 0; }
-        .sort-buttons button { padding:8px 15px; font-size:14px; background:#666; color:white; border:none; border-radius:5px; cursor:pointer; }
-        .sort-buttons button:hover { background:#888; }
-        .results { margin:20px; }
-        .result-card { background:white; border:1px solid #ccc; padding:15px; margin-bottom:10px; border-radius:8px; cursor:pointer; transition:background 0.3s; }
-        .result-card:hover { background:#f0f0f0; }
-        .back-button { display:block; margin:30px auto; padding:10px 20px; font-size:16px; background:#333; color:white; border:none; border-radius:5px; cursor:pointer; text-align:center; }
-        .back-button:hover { background:#555; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            text-align: center;
+        }
+        .search-container, .sort-container {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+            gap: 10px;
+        }
+        .car-card {
+            border: 1px solid #ccc;
+            background: white;
+            padding: 10px;
+            margin: 10px;
+            cursor: pointer;
+        }
+        .car-card:hover {
+            background: #eee;
+        }
+        #results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 10px;
+        }
+        .back-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #ddd;
+            border: none;
+            cursor: pointer;
+        }
+        .back-button:hover {
+            background-color: #bbb;
+        }
     </style>
 </head>
 <body>
-    <header>Suchergebnisse - Automobile-Data</header>
+    <h1>Suchergebnisse</h1>
 
+    <!-- Suchfelder -->
     <div class="search-container">
         <input type="text" id="marke" placeholder="Marke">
         <input type="text" id="modell" placeholder="Modell">
         <input type="text" id="baujahr" placeholder="Baujahr">
         <input type="text" id="kraftstoff" placeholder="Kraftstoffart">
-        <button onclick="applyFilters()">Suchen</button>
+        <button onclick="renderResults()">Suchen</button>
     </div>
 
-    <div class="sort-buttons">
-        <button onclick="sortResults('baujahr', true)">Baujahr ↑</button>
-        <button onclick="sortResults('baujahr', false)">Baujahr ↓</button>
-        <button onclick="sortResults('ps', true)">PS ↑</button>
-        <button onclick="sortResults('ps', false)">PS ↓</button>
+    <!-- Sortierung -->
+    <div class="sort-container">
+        <label for="sort">Sortieren nach:</label>
+        <select id="sort" onchange="renderResults()">
+            <option value="">-- Keine Sortierung --</option>
+            <option value="baujahr-asc">Baujahr (aufsteigend)</option>
+            <option value="baujahr-desc">Baujahr (absteigend)</option>
+            <option value="ps-asc">PS (aufsteigend)</option>
+            <option value="ps-desc">PS (absteigend)</option>
+            <option value="name-asc">Name (A–Z)</option>
+            <option value="name-desc">Name (Z–A)</option>
+        </select>
     </div>
 
-    <div class="results" id="results"></div>
+    <!-- Ergebnisse -->
+    <div id="results"></div>
 
+    <!-- Zurück Button -->
     <button class="back-button" onclick="goBack()">Zurück</button>
 
+    <script src="autos.js"></script>
     <script>
-        const cars = [
-            { id:1, marke:"Audi", modell:"A6", baujahr:2021, kraftstoff:"Hybrid", ps:245,
-              kategorien:{ "Karosserie":{ länge:"4939 mm", breite:"1874 mm", höhe:"1461 mm", türen:4, sitze:5 },
-                           "Motor":{ hubraum:"1984 ccm", zylinder:4, ps:245, drehmoment:"370 Nm", verbrauch:"5,9 l/100km" },
-                           "Getriebe":{ typ:"Automatik", gänge:7, allrad:"Quattro" },
-                           "Fahrwerk":{ federung:"Mehrlenker hinten", bremsen:"Scheibenbremse v/h", lenkung:"Servolenkung elektrisch" },
-                           "Sicherheit":{ airbags:6, abs:"Ja", esp:"Ja", assistenzsysteme:"Abstandsregeltempomat, Spurhalteassistent" },
-                           "Infotainment":{ display:"10,1 Zoll", bluetooth:"Ja", navigationssystem:"Ja", soundanlage:"Bang & Olufsen" },
-                           "Extras":{ panorama_dach:"Ja", sitzheizung:"Vorne & Hinten", led_scheinwerfer:"Ja", parkassistent:"Ja" } } },
-            { id:2, marke:"VW", modell:"Golf", baujahr:2017, kraftstoff:"Benzin", ps:110,
-              kategorien:{ "Karosserie":{ länge:"4255 mm", breite:"1799 mm", höhe:"1452 mm", türen:5, sitze:5 },
-                           "Motor":{ hubraum:"1395 ccm", zylinder:4, ps:110, drehmoment:"200 Nm", verbrauch:"5,2 l/100km" },
-                           "Getriebe":{ typ:"Manuell", gänge:6, allrad:"Nein" },
-                           "Fahrwerk":{ federung:"McPherson vorne", bremsen:"Scheibenbremse v/h", lenkung:"Servolenkung elektrisch" },
-                           "Sicherheit":{ airbags:6, abs:"Ja", esp:"Ja", assistenzsysteme:"Spurhalteassistent" },
-                           "Infotainment":{ display:"8 Zoll", bluetooth:"Ja", navigationssystem:"Optional", soundanlage:"Standard" },
-                           "Extras":{ panorama_dach:"Nein", sitzheizung:"Vorne optional", led_scheinwerfer:"Nein", parkassistent:"Ja" } } },
-            { id:3, marke:"BMW", modell:"320i", baujahr:2016, kraftstoff:"Benzin", ps:170,
-              kategorien:{ "Karosserie":{ länge:"4624 mm", breite:"1800 mm", höhe:"1435 mm", türen:4, sitze:5 },
-                           "Motor":{ hubraum:"1998 ccm", zylinder:4, ps:170, drehmoment:"250 Nm", verbrauch:"6,0 l/100km" },
-                           "Getriebe":{ typ:"Automatik", gänge:8, allrad:"Nein" },
-                           "Fahrwerk":{ federung:"Mehrlenker hinten", bremsen:"Scheibenbremse v/h", lenkung:"Servolenkung elektrisch" },
-                           "Sicherheit":{ airbags:6, abs:"Ja", esp:"Ja", assistenzsysteme:"Abstandsregeltempomat" },
-                           "Infotainment":{ display:"8,8 Zoll", bluetooth:"Ja", navigationssystem:"Ja", soundanlage:"HiFi" },
-                           "Extras":{ panorama_dach:"Optional", sitzheizung:"Vorne & Hinten optional", led_scheinwerfer:"Ja", parkassistent:"Ja" } } },
-            { id:4, marke:"Mercedes", modell:"C200", baujahr:2019, kraftstoff:"Diesel", ps:160,
-              kategorien:{ "Karosserie":{ länge:"4686 mm", breite:"1810 mm", höhe:"1442 mm", türen:4, sitze:5 },
-                           "Motor":{ hubraum:"1950 ccm", zylinder:4, ps:160, drehmoment:"360 Nm", verbrauch:"4,8 l/100km" },
-                           "Getriebe":{ typ:"Automatik", gänge:9, allrad:"Nein" },
-                           "Fahrwerk":{ federung:"Mehrlenker hinten", bremsen:"Scheibenbremse v/h", lenkung:"Servolenkung elektrisch" },
-                           "Sicherheit":{ airbags:6, abs:"Ja", esp:"Ja", assistenzsysteme:"Spurhalteassistent, Totwinkelwarner" },
-                           "Infotainment":{ display:"10,25 Zoll", bluetooth:"Ja", navigationssystem:"Ja", soundanlage:"Burmester" },
-                           "Extras":{ panorama_dach:"Ja", sitzheizung:"Vorne & Hinten", led_scheinwerfer:"Ja", parkassistent:"Ja" } } },
-            { id:5, marke:"Audi", modell:"Q5", baujahr:2020, kraftstoff:"Benzin", ps:249,
-              kategorien:{ "Karosserie":{ länge:"4663 mm", breite:"1898 mm", höhe:"1659 mm", türen:5, sitze:5 },
-                           "Motor":{ hubraum:"1984 ccm", zylinder:4, ps:249, drehmoment:"370 Nm", verbrauch:"6,7 l/100km" },
-                           "Getriebe":{ typ:"Automatik", gänge:7, allrad:"Quattro" },
-                           "Fahrwerk":{ federung:"Mehrlenker hinten", bremsen:"Scheibenbremse v/h", lenkung:"Servolenkung elektrisch" },
-                           "Sicherheit":{ airbags:6, abs:"Ja", esp:"Ja", assistenzsysteme:"Abstandsregeltempomat, Spurhalteassistent" },
-                           "Infotainment":{ display:"10,1 Zoll", bluetooth:"Ja", navigationssystem:"Ja", soundanlage:"Bang & Olufsen" },
-                           "Extras":{ panorama_dach:"Ja", sitzheizung:"Vorne & Hinten", led_scheinwerfer:"Ja", parkassistent:"Ja" } } },
-            { id:6, marke:"VW", modell:"Passat", baujahr:2018, kraftstoff:"Diesel", ps:190,
-              kategorien:{ "Karosserie":{ länge:"4767 mm", breite:"1832 mm", höhe:"1456 mm", türen:4, sitze:5 },
-                           "Motor":{ hubraum:"1968 ccm", zylinder:4, ps:190, drehmoment:"400 Nm", verbrauch:"5,1 l/100km" },
-                           "Getriebe":{ typ:"Automatik", gänge:7, allrad:"Nein" },
-                           "Fahrwerk":{ federung:"Mehrlenker hinten", bremsen:"Scheibenbremse v/h", lenkung:"Servolenkung elektrisch" },
-                           "Sicherheit":{ airbags:6, abs:"Ja", esp:"Ja", assistenzsysteme:"Spurhalteassistent, Notbremsassistent" },
-                           "Infotainment":{ display:"8 Zoll", bluetooth:"Ja", navigationssystem:"Ja", soundanlage:"Standard" },
-                           "Extras":{ panorama_dach:"Nein", sitzheizung:"Vorne optional", led_scheinwerfer:"Nein", parkassistent:"Ja" } } },
-            { id:7, marke:"BMW", modell:"X3", baujahr:2021, kraftstoff:"Hybrid", ps:292,
-              kategorien:{ "Karosserie":{ länge:"4710 mm", breite:"1891 mm", höhe:"1676 mm", türen:5, sitze:5 },
-                           "Motor":{ hubraum:"1998 ccm", zylinder:4, ps:292, drehmoment:"420 Nm", verbrauch:"5,8 l/100km" },
-                           "Getriebe":{ typ:"Automatik", gänge:8, allrad:"xDrive" },
-                           "Fahrwerk":{ federung:"Mehrlenker hinten", bremsen:"Scheibenbremse v/h", lenkung:"Servolenkung elektrisch" },
-                           "Sicherheit":{ airbags:6, abs:"Ja", esp:"Ja", assistenzsysteme:"Abstandsregeltempomat, Spurhalteassistent" },
-                           "Infotainment":{ display:"10,25 Zoll", bluetooth:"Ja", navigationssystem:"Ja", soundanlage:"Harman Kardon" },
-                           "Extras":{ panorama_dach:"Ja", sitzheizung:"Vorne & Hinten", led_scheinwerfer:"Ja", parkassistent:"Ja" } } },
-            { id:8, marke:"Mercedes", modell:"E200", baujahr:2020, kraftstoff:"Benzin", ps:184,
-              kategorien:{ "Karosserie":{ länge:"4923 mm", breite:"1852 mm", höhe:"1468 mm", türen:4, sitze:5 },
-                           "Motor":{ hubraum:"1991 ccm", zylinder:4, ps:184, drehmoment:"300 Nm", verbrauch:"6,2 l/100km" },
-                           "Getriebe":{ typ:"Automatik", gänge:9, allrad:"Nein" },
-                           "Fahrwerk":{ federung:"Mehrlenker hinten", bremsen:"Scheibenbremse v/h", lenkung:"Servolenkung elektrisch" },
-                           "Sicherheit":{ airbags:6, abs:"Ja", esp:"Ja", assistenzsysteme:"Spurhalteassistent, Totwinkelwarner" },
-                           "Infotainment":{ display:"10,25 Zoll", bluetooth:"Ja", navigationssystem:"Ja", soundanlage:"Burmester" },
-                           "Extras":{ panorama_dach:"Ja", sitzheizung:"Vorne & Hinten", led_scheinwerfer:"Ja", parkassistent:"Ja" } } }
-        ];
-
-        let filteredCars = [...cars];
-
         function getQueryParams() {
             const params = {};
-            const queryString = window.location.search.substring(1);
-            const pairs = queryString.split("&");
-            for (let pair of pairs) {
-                if(pair==="") continue;
-                const [key,value] = pair.split("=");
-                params[decodeURIComponent(key)] = decodeURIComponent(value || "");
-            }
+            window.location.search.substring(1).split("&").forEach(pair => {
+                const [key, value] = pair.split("=");
+                if (key) params[key] = decodeURIComponent(value || "");
+            });
             return params;
         }
 
-        function applyFilters() {
-            const marke = document.getElementById("marke").value.toLowerCase();
-            const modell = document.getElementById("modell").value.toLowerCase();
-            const baujahr = document.getElementById("baujahr").value;
-            const kraftstoff = document.getElementById("kraftstoff").value.toLowerCase();
+        function filterCars() {
+            const params = getQueryParams();
+            const marke = document.getElementById("marke").value || params.marke || "";
+            const modell = document.getElementById("modell").value || params.modell || "";
+            const baujahr = document.getElementById("baujahr").value || params.baujahr || "";
+            const kraftstoff = document.getElementById("kraftstoff").value || params.kraftstoff || "";
 
-            filteredCars = cars.filter(car =>
-                (!marke || car.marke.toLowerCase().includes(marke)) &&
-                (!modell || car.modell.toLowerCase().includes(modell)) &&
-                (!baujahr || car.baujahr.toString() === baujahr) &&
-                (!kraftstoff || car.kraftstoff.toLowerCase().includes(kraftstoff))
+            return autos.filter(auto =>
+                (marke === "" || auto.marke.toLowerCase().includes(marke.toLowerCase())) &&
+                (modell === "" || auto.modell.toLowerCase().includes(modell.toLowerCase())) &&
+                (baujahr === "" || auto.baujahr.toString() === baujahr) &&
+                (kraftstoff === "" || auto.kraftstoff.toLowerCase().includes(kraftstoff.toLowerCase()))
             );
-
-            renderResults();
         }
 
         function renderResults() {
-            const resultsDiv = document.getElementById("results");
-            resultsDiv.innerHTML = "";
+            const resultsContainer = document.getElementById("results");
+            resultsContainer.innerHTML = "";
 
-            if(filteredCars.length===0) {
-                resultsDiv.innerHTML = "<p>Keine Ergebnisse gefunden.</p>";
+            let filteredCars = filterCars();
+
+            // Sortierung anwenden
+            const sortValue = document.getElementById("sort").value;
+            if (sortValue === "baujahr-asc") {
+                filteredCars.sort((a, b) => a.baujahr - b.baujahr);
+            } else if (sortValue === "baujahr-desc") {
+                filteredCars.sort((a, b) => b.baujahr - a.baujahr);
+            } else if (sortValue === "ps-asc") {
+                filteredCars.sort((a, b) => a.ps - b.ps);
+            } else if (sortValue === "ps-desc") {
+                filteredCars.sort((a, b) => b.ps - a.ps);
+            } else if (sortValue === "name-asc") {
+                filteredCars.sort((a, b) => (a.marke + " " + a.modell).localeCompare(b.marke + " " + b.modell));
+            } else if (sortValue === "name-desc") {
+                filteredCars.sort((a, b) => (b.marke + " " + b.modell).localeCompare(a.marke + " " + a.modell));
+            }
+
+            // Ergebnisse anzeigen
+            if (filteredCars.length === 0) {
+                resultsContainer.innerHTML = "<p>Keine Ergebnisse gefunden.</p>";
                 return;
             }
 
-            filteredCars.forEach(car=>{
-                const card = document.createElement("div");
-                card.className="result-card";
-                card.innerHTML=`<strong>${car.marke} ${car.modell}</strong><br>Baujahr: ${car.baujahr}, Kraftstoff: ${car.kraftstoff}, ${car.ps} PS`;
-                card.onclick=()=>goToDetails(car.id);
-                resultsDiv.appendChild(card);
+            filteredCars.forEach(car => {
+                const div = document.createElement("div");
+                div.className = "car-card";
+                div.textContent = `${car.marke} ${car.modell} (${car.baujahr}) - ${car.kraftstoff} - ${car.ps} PS`;
+                div.onclick = () => {
+                    const url = `details.html?id=${car.id}`;
+                    window.location.href = url;
+                };
+                resultsContainer.appendChild(div);
             });
         }
 
-        function sortResults(key, ascending){
-            filteredCars.sort((a,b)=>ascending?a[key]-b[key]:b[key]-a[key]);
-            renderResults();
+        function goBack() {
+            window.location.href = "index.html";
         }
 
-        function init(){
-            const params = getQueryParams();
-            if(params.marke) document.getElementById("marke").value=params.marke;
-            if(params.modell) document.getElementById("modell").value=params.modell;
-            if(params.baujahr) document.getElementById("baujahr").value=params.baujahr;
-            if(params.kraftstoff) document.getElementById("kraftstoff").value=params.kraftstoff;
-            applyFilters();
-        }
-
-        function goToDetails(id){ window.location.href=`details.html?id=${id}`; }
-        function goBack(){ window.location.href="index.html"; }
-
-        init();
+        // Seite starten mit Ergebnissen
+        renderResults();
     </script>
 </body>
 </html>
