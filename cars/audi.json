@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "brand": "Audi",
+    "model": "A6",
+    "year": 2021,
+    "fuel": "Hybrid",
+    "horsepower": 245
+  },
+  {
+    "id": 2,
+    "brand": "Audi",
+    "model": "Q5",
+    "year": 2020,
+    "fuel": "Petrol",
+    "horsepower": 249
+  }
+]
