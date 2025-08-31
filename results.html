@@ -1,117 +1,220 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>Suchergebnisse</title>
-<style>
-    body { font-family: Arial, sans-serif; margin:20px; background-color:#f0f0f5; }
-    header { background-color:#333; color:white; padding:20px; text-align:center; }
-    .filter-bar { background-color:white; padding:20px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
-    input, button { padding:6px; }
-    ul { list-style-type:none; padding:0; max-width:800px; margin:auto; }
-    li { background-color:white; margin:10px 0; padding:15px; border-radius:8px; cursor:pointer; box-shadow:0 0 5px rgba(0,0,0,0.1); }
-    li:hover { background-color:#e0e0ff; }
-    button.back {
-        display:block;
-        margin:20px auto;
-        padding:10px 20px;
-        cursor:pointer;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Automobile-Data – Ergebnisse</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .search-container input {
+            margin: 5px;
+            padding: 5px;
+        }
+
+        .sort-container {
+            margin: 15px 0;
+            text-align: center;
+        }
+
+        .sort-container label {
+            margin-right: 5px;
+        }
+
+        .sort-container select {
+            margin-right: 15px;
+            padding: 5px;
+        }
+
+        #results {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .result-card {
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .back-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .back-button:hover {
+            background-color: #555;
+        }
+    </style>
 </head>
 <body>
-<header>
-    <h1>Suchergebnisse</h1>
-</header>
+    <header>
+        <h1>Automobile-Data</h1>
+    </header>
 
-<button class="back" onclick="window.history.back()">Zurück</button>
+    <!-- Suchfelder -->
+    <div class="search-container">
+        <input type="text" id="marke" placeholder="Marke">
+        <input type="text" id="modell" placeholder="Modell">
+        <input type="text" id="baujahr" placeholder="Baujahr">
+        <input type="text" id="kraftstoff" placeholder="Kraftstoff">
+        <button onclick="applyFilters()">Suchen</button>
+    </div>
 
-<div class="filter-bar">
-    <input id="marke" placeholder="Marke">
-    <input id="modell" placeholder="Modell">
-    <input id="baujahr" placeholder="Baujahr">
-    <input id="kraftstoff" placeholder="Kraftstoffart">
-    <button id="filterBtn">Filtern</button>
-</div>
+    <!-- Sortierfelder -->
+    <div class="sort-container">
+        <label for="sort">Sortieren nach:</label>
+        <select id="sort">
+            <option value="baujahr">Baujahr</option>
+            <option value="ps">PS</option>
+            <option value="verbrauch">Verbrauch</option>
+        </select>
 
-<ul id="results"></ul>
+        <label for="direction" id="direction-label">Richtung:</label>
+        <select id="direction">
+            <option value="asc">Aufsteigend</option>
+            <option value="desc">Absteigend</option>
+        </select>
+    </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    let autos = [];
+    <!-- Ergebnisse -->
+    <div id="results"></div>
 
-    const params = new URLSearchParams(window.location.search);
-    const markeInput = document.getElementById('marke');
-    const modellInput = document.getElementById('modell');
-    const baujahrInput = document.getElementById('baujahr');
-    const kraftstoffInput = document.getElementById('kraftstoff');
-    const resultsUl = document.getElementById('results');
-    const filterBtn = document.getElementById('filterBtn');
+    <!-- Zurück-Button -->
+    <button class="back-button" onclick="goBack()">Zurück</button>
 
-    fetch('autos.json')
-        .then(response => response.json())
-        .then(data => {
-            autos = data;
-            applyInitialParams();
-            renderResults();
-        })
-        .catch(err => console.error("Fehler beim Laden von autos.json:", err));
+    <script>
+        // Beispiel-Datenbank
+        const autos = [
+            { id: 1, marke: "VW", modell: "Golf", baujahr: 2018, kraftstoff: "Benzin", ps: 150, verbrauch: 6.5 },
+            { id: 2, marke: "VW", modell: "Polo", baujahr: 2020, kraftstoff: "Diesel", ps: 95, verbrauch: 4.8 },
+            { id: 3, marke: "BMW", modell: "3er", baujahr: 2019, kraftstoff: "Benzin", ps: 190, verbrauch: 7.2 },
+            { id: 4, marke: "Audi", modell: "A4", baujahr: 2021, kraftstoff: "Hybrid", ps: 204, verbrauch: 5.4 }
+        ];
 
-    function applyInitialParams() {
-        markeInput.value = params.get('marke') || '';
-        modellInput.value = params.get('modell') || '';
-        baujahrInput.value = params.get('baujahr') || '';
-        kraftstoffInput.value = params.get('kraftstoff') || '';
+        let currentResults = [];
 
-        updatePlaceholders();
-    }
+        // Ergebnisse anzeigen
+        function displayResults(results) {
+            currentResults = results;
+            const resultsContainer = document.getElementById("results");
+            resultsContainer.innerHTML = "";
 
-    function updatePlaceholders() {
-        const selectedMarke = markeInput.value.toLowerCase();
-        const filteredAutos = selectedMarke ? autos.filter(a => a.marke.toLowerCase().includes(selectedMarke)) : autos;
+            if (results.length === 0) {
+                resultsContainer.innerHTML = "<p>Keine Ergebnisse gefunden.</p>";
+                return;
+            }
 
-        const modelle = Array.from(new Set(filteredAutos.map(a => a.modell))).sort();
-        modellInput.placeholder = modelle.length ? `z.B. ${modelle[0]}` : "Modell";
-
-        const baujahre = Array.from(new Set(filteredAutos.map(a => a.baujahr))).sort((a,b)=>a-b);
-        baujahrInput.placeholder = baujahre.length ? `z.B. ${baujahre[0]}` : "Baujahr";
-
-        const kraftstoffe = Array.from(new Set(filteredAutos.map(a => a.kraftstoff).filter(k=>k))).sort();
-        kraftstoffInput.placeholder = kraftstoffe.length ? `z.B. ${kraftstoffe[0]}` : "Kraftstoffart";
-    }
-
-    function renderResults() {
-        const marke = markeInput.value.toLowerCase();
-        const modell = modellInput.value.toLowerCase();
-        const baujahr = baujahrInput.value;
-        const kraftstoff = kraftstoffInput.value.toLowerCase();
-
-        const filtered = autos.filter(auto => {
-            return (!marke || auto.marke.toLowerCase().includes(marke)) &&
-                   (!modell || auto.modell.toLowerCase().includes(modell)) &&
-                   (!baujahr || auto.baujahr == baujahr) &&
-                   (!kraftstoff || auto.kraftstoff.toLowerCase().includes(kraftstoff));
-        });
-
-        resultsUl.innerHTML = '';
-        if(filtered.length === 0) {
-            resultsUl.innerHTML = '<li>Keine Autos gefunden</li>';
-        } else {
-            filtered.forEach(auto => {
-                const li = document.createElement('li');
-                li.textContent = `${auto.marke} ${auto.modell} (${auto.baujahr})`;
-                li.onclick = () => window.location.href = 'details.html?id=' + auto.id;
-                resultsUl.appendChild(li);
+            results.forEach(auto => {
+                const card = document.createElement("div");
+                card.classList.add("result-card");
+                card.innerHTML = `
+                    <h3>${auto.marke} ${auto.modell}</h3>
+                    <p>Baujahr: ${auto.baujahr}</p>
+                    <p>Kraftstoff: ${auto.kraftstoff}</p>
+                    <p>PS: ${auto.ps}</p>
+                    <p>Verbrauch: ${auto.verbrauch} l/100km</p>
+                    <button onclick="goToDetails(${auto.id})">Details ansehen</button>
+                `;
+                resultsContainer.appendChild(card);
             });
         }
 
-        updatePlaceholders();
-    }
+        // Filter anwenden
+        function applyFilters() {
+            const marke = document.getElementById("marke").value.toLowerCase();
+            const modell = document.getElementById("modell").value.toLowerCase();
+            const baujahr = document.getElementById("baujahr").value;
+            const kraftstoff = document.getElementById("kraftstoff").value.toLowerCase();
 
-    markeInput.addEventListener('input', updatePlaceholders);
+            const filtered = autos.filter(auto =>
+                (marke === "" || auto.marke.toLowerCase().includes(marke)) &&
+                (modell === "" || auto.modell.toLowerCase().includes(modell)) &&
+                (baujahr === "" || auto.baujahr.toString() === baujahr) &&
+                (kraftstoff === "" || auto.kraftstoff.toLowerCase().includes(kraftstoff))
+            );
 
-    filterBtn.addEventListener('click', renderResults);
-});
-</script>
+            displayResults(filtered);
+            updateSort();
+        }
+
+        // Sortierung anwenden
+        document.getElementById("sort").addEventListener("change", updateSort);
+        document.getElementById("direction").addEventListener("change", updateSort);
+
+        function updateSort() {
+            const sortBy = document.getElementById("sort").value;
+            const direction = document.getElementById("direction").value;
+            const directionLabel = document.getElementById("direction-label");
+            const directionSelect = document.getElementById("direction");
+
+            // Richtung nur bei Baujahr und PS anzeigen
+            if (sortBy === "baujahr" || sortBy === "ps") {
+                directionLabel.style.display = "inline-block";
+                directionSelect.style.display = "inline-block";
+            } else {
+                directionLabel.style.display = "none";
+                directionSelect.style.display = "none";
+            }
+
+            let sorted = [...currentResults];
+
+            sorted.sort((a, b) => {
+                let valA = a[sortBy];
+                let valB = b[sortBy];
+
+                if (sortBy === "ps" || sortBy === "baujahr") {
+                    valA = parseInt(valA);
+                    valB = parseInt(valB);
+                } else if (sortBy === "verbrauch") {
+                    valA = parseFloat(valA);
+                    valB = parseFloat(valB);
+                }
+
+                if (direction === "desc" && (sortBy === "ps" || sortBy === "baujahr")) {
+                    return valB - valA;
+                }
+                return valA - valB;
+            });
+
+            displayResults(sorted);
+        }
+
+        // Details öffnen
+        function goToDetails(id) {
+            window.location.href = `details.html?id=${id}`;
+        }
+
+        // Zurück zur Hauptseite
+        function goBack() {
+            window.location.href = "index.html";
+        }
+
+        // Seite initial laden
+        applyFilters();
+    </script>
 </body>
 </html>
