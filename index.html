@@ -2,108 +2,80 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Auto-Datenbank</title>
+    <title>Auto-Suche</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f5f5f5;
+            background-color: #f0f0f5;
+            margin: 0;
+            padding: 0;
         }
-        h1 { text-align: center; color: #333; }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 20px;
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
         }
-        th, td {
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-            text-align: left;
-            cursor: pointer;
+        main {
+            display: flex;
+            justify-content: center;
+            margin-top: 50px;
         }
-        th { background-color: #eee; }
-        input {
-            padding: 6px;
-            width: 200px;
+        .search-form {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .search-form label {
+            display: block;
             margin-top: 10px;
+        }
+        .search-form input {
+            width: 250px;
+            padding: 6px;
+            margin-top: 5px;
+        }
+        .search-form button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-    <h1>Auto-Datenbank</h1>
-    <input type="text" id="search" placeholder="Nach Marke oder Modell suchen..." onkeyup="filterTable()">
+    <header>
+        <h1>Auto-Suche</h1>
+    </header>
+    <main>
+        <div class="search-form">
+            <label for="marke">Marke:</label>
+            <input type="text" id="marke" placeholder="z.B. VW">
 
-    <table id="autoTable">
-        <thead>
-            <tr>
-                <th onclick="sortTable(0)">Marke &#x25B2;&#x25BC;</th>
-                <th onclick="sortTable(1)">Modell &#x25B2;&#x25BC;</th>
-                <th onclick="sortTable(2)">Baujahr &#x25B2;&#x25BC;</th>
-                <th onclick="sortTable(3)">PS &#x25B2;&#x25BC;</th>
-                <th onclick="sortTable(4)">Verbrauch (l/100km) &#x25B2;&#x25BC;</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+            <label for="modell">Modell:</label>
+            <input type="text" id="modell" placeholder="z.B. Golf">
+
+            <label for="baujahr">Baujahr:</label>
+            <input type="text" id="baujahr" placeholder="optional">
+
+            <label for="ps">PS:</label>
+            <input type="text" id="ps" placeholder="optional">
+
+            <button onclick="searchAuto()">Suchen</button>
+        </div>
+    </main>
 
     <script>
-        let autoData = [];
+        function searchAuto() {
+            // Werte auslesen
+            const marke = document.getElementById('marke').value;
+            const modell = document.getElementById('modell').value;
+            const baujahr = document.getElementById('baujahr').value;
+            const ps = document.getElementById('ps').value;
 
-        // JSON-Datei laden
-        fetch('autos.json')
-            .then(response => response.json())
-            .then(data => {
-                autoData = data;
-                displayTable(autoData);
-            });
-
-        // Tabelle anzeigen
-        function displayTable(data) {
-            const tbody = document.querySelector('#autoTable tbody');
-            tbody.innerHTML = '';
-            data.forEach(auto => {
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${auto.marke}</td>
-                    <td>${auto.modell}</td>
-                    <td>${auto.baujahr}</td>
-                    <td>${auto.ps}</td>
-                    <td>${auto.verbrauch}</td>
-                `;
-                tbody.appendChild(row);
-            });
-        }
-
-        // Suchfunktion
-        function filterTable() {
-            const input = document.getElementById('search').value.toLowerCase();
-            const filtered = autoData.filter(auto =>
-                auto.marke.toLowerCase().includes(input) ||
-                auto.modell.toLowerCase().includes(input)
-            );
-            displayTable(filtered);
-        }
-
-        // Sortierfunktion
-        let sortDirections = [true, true, true, true, true]; // aufsteigend = true
-        function sortTable(colIndex) {
-            sortDirections[colIndex] = !sortDirections[colIndex];
-            autoData.sort((a, b) => {
-                let valA, valB;
-                switch(colIndex) {
-                    case 0: valA = a.marke; valB = b.marke; break;
-                    case 1: valA = a.modell; valB = b.modell; break;
-                    case 2: valA = a.baujahr; valB = b.baujahr; break;
-                    case 3: valA = a.ps; valB = b.ps; break;
-                    case 4: valA = a.verbrauch; valB = b.verbrauch; break;
-                }
-                if (typeof valA === 'string') valA = valA.toLowerCase();
-                if (typeof valB === 'string') valB = valB.toLowerCase();
-                if(valA < valB) return sortDirections[colIndex] ? -1 : 1;
-                if(valA > valB) return sortDirections[colIndex] ? 1 : -1;
-                return 0;
-            });
-            displayTable(autoData);
+            // Wir speichern die Suchparameter temporär in der URL (Dummy-Daten)
+            const params = new URLSearchParams({ marke, modell, baujahr, ps });
+            window.location.href = 'results.html?' + params.toString();
         }
     </script>
 </body>
