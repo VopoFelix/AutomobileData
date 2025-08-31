@@ -1,4 +1,5 @@
 [
+    {"id":X,"brand":marke,"model":modell,"construction_year":baujahr,"fuel_type":kraftstoffart,"body_type":karosserie,"seats":sitze,"doors":türen,"fuel_consumption":kraftstoffverbrauch,"horsepower":ps,"torque":drehmoment,"layout":motorlayout,"displacement":hubraum,"configuration":konfiguration,"aspiration":aufladung}
     {"id":1,"marke":"VW","modell":"Golf","baujahr":2018,"ps":110,"verbrauch":5.8,"motor":"1.4 TSI","kraftstoff":"Benzin"},
     {"id":2,"marke":"VW","modell":"Golf","baujahr":2020,"ps":130,"verbrauch":5.6,"motor":"1.5 TSI","kraftstoff":"Benzin"},
     {"id":3,"marke":"VW","modell":"Passat","baujahr":2019,"ps":150,"verbrauch":6.2,"motor":"2.0 TDI","kraftstoff":"Diesel"},
@@ -6,6 +7,7 @@
     {"id":5,"marke":"BMW","modell":"3er","baujahr":2019,"ps":180,"verbrauch":6.1,"motor":"2.0 Turbo","kraftstoff":"Benzin"},
     {"id":6,"marke":"Toyota","modell":"Supra MK4","baujahr":"1993-2002","ps":"330","verbrauch":"11","motor":"I6","kraftstoff":"Benzin"}
 ]
+
 
 
 
