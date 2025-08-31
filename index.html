@@ -2,24 +2,56 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <title>Auto-Suche</title>
+    <title>Automobile-Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin:0; background-color:#f0f0f5; }
+        header { background-color:#333; color:white; padding:20px; text-align:center; }
+        .search-bar { background-color:white; padding:20px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:10px; }
+        .search-bar input { padding:6px; width:150px; }
+        .search-bar button { padding:6px 12px; }
+        .brands-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:20px; margin:30px; }
+        .brand { background-color:white; padding:20px; text-align:center; border-radius:8px; cursor:pointer; box-shadow:0 0 5px rgba(0,0,0,0.1); }
+        .brand:hover { background-color:#e0e0ff; }
+    </style>
 </head>
 <body>
-    <h1>Auto-Suche</h1>
-    <label>Marke: <input type="text" id="marke" placeholder="z.B. VW"></label><br>
-    <label>Modell: <input type="text" id="modell" placeholder="z.B. Golf"></label><br>
-    <label>Baujahr: <input type="text" id="baujahr" placeholder="optional"></label><br>
-    <label>PS: <input type="text" id="ps" placeholder="optional"></label><br>
-    <button onclick="searchAuto()">Suchen</button>
+    <header>
+        <h1>Automobile-Data</h1>
+    </header>
+
+    <div class="search-bar">
+        <input type="text" id="marke" placeholder="Marke">
+        <input type="text" id="modell" placeholder="Modell">
+        <input type="text" id="baujahr" placeholder="Baujahr">
+        <input type="text" id="kraftstoff" placeholder="Kraftstoffart">
+        <button onclick="searchAuto()">Suchen</button>
+    </div>
+
+    <div class="brands-grid" id="brandsGrid"></div>
 
     <script>
+        // Dummy-Marken
+        const brands = ["VW", "Audi", "BMW", "Mercedes", "Ford", "Toyota", "Honda", "Tesla"];
+
+        const grid = document.getElementById('brandsGrid');
+        brands.forEach(brand => {
+            const div = document.createElement('div');
+            div.className = 'brand';
+            div.textContent = brand;
+            div.onclick = () => {
+                // Klick auf Marke → Weiterleitung zur Ergebnis-Seite
+                window.location.href = 'results.html?marke=' + encodeURIComponent(brand);
+            };
+            grid.appendChild(div);
+        });
+
         function searchAuto() {
             const marke = document.getElementById('marke').value;
             const modell = document.getElementById('modell').value;
             const baujahr = document.getElementById('baujahr').value;
-            const ps = document.getElementById('ps').value;
+            const kraftstoff = document.getElementById('kraftstoff').value;
 
-            const params = new URLSearchParams({ marke, modell, baujahr, ps });
+            const params = new URLSearchParams({ marke, modell, baujahr, kraftstoff });
             window.location.href = 'results.html?' + params.toString();
         }
     </script>
