@@ -2,65 +2,101 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Automobile-Data – Ergebnisse</title>
+    <title>Suchergebnisse - Automobile-Data</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            margin: 20px;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
         }
 
         header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
             text-align: center;
-            margin-bottom: 20px;
+            font-size: 24px;
+            font-weight: bold;
         }
 
         .search-container {
-            margin-bottom: 20px;
-            text-align: center;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 20px;
         }
 
         .search-container input {
-            margin: 5px;
-            padding: 5px;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
 
-        .sort-container {
-            margin: 15px 0;
-            text-align: center;
+        .search-container button {
+            padding: 8px 15px;
+            font-size: 16px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
 
-        .sort-container label {
-            margin-right: 5px;
+        .search-container button:hover {
+            background-color: #555;
         }
 
-        .sort-container select {
-            margin-right: 15px;
-            padding: 5px;
-        }
-
-        #results {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        .sort-buttons {
+            display: flex;
+            justify-content: center;
             gap: 15px;
+            margin: 10px 0;
+        }
+
+        .sort-buttons button {
+            padding: 8px 15px;
+            font-size: 14px;
+            background-color: #666;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .sort-buttons button:hover {
+            background-color: #888;
+        }
+
+        .results {
+            margin: 20px;
         }
 
         .result-card {
+            background: white;
             border: 1px solid #ccc;
             padding: 15px;
+            margin-bottom: 10px;
             border-radius: 8px;
-            text-align: center;
-            box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .result-card:hover {
+            background: #f0f0f0;
         }
 
         .back-button {
             display: block;
-            margin: 20px auto;
+            margin: 30px auto;
             padding: 10px 20px;
+            font-size: 16px;
             background-color: #333;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 5px;
             cursor: pointer;
             text-align: center;
         }
@@ -72,75 +108,54 @@
 </head>
 <body>
     <header>
-        <h1>Automobile-Data</h1>
+        Suchergebnisse - Automobile-Data
     </header>
 
-    <!-- Suchfelder -->
+    <!-- Suchleiste -->
     <div class="search-container">
         <input type="text" id="marke" placeholder="Marke">
         <input type="text" id="modell" placeholder="Modell">
         <input type="text" id="baujahr" placeholder="Baujahr">
-        <input type="text" id="kraftstoff" placeholder="Kraftstoff">
+        <input type="text" id="kraftstoff" placeholder="Kraftstoffart">
         <button onclick="applyFilters()">Suchen</button>
     </div>
 
-    <!-- Sortierfelder -->
-    <div class="sort-container">
-        <label for="sort">Sortieren nach:</label>
-        <select id="sort">
-            <option value="baujahr">Baujahr</option>
-            <option value="ps">PS</option>
-            <option value="verbrauch">Verbrauch</option>
-        </select>
-
-        <label for="direction" id="direction-label">Richtung:</label>
-        <select id="direction">
-            <option value="asc">Aufsteigend</option>
-            <option value="desc">Absteigend</option>
-        </select>
+    <!-- Sortier-Buttons -->
+    <div class="sort-buttons">
+        <button onclick="sortResults('baujahr', true)">Baujahr ↑</button>
+        <button onclick="sortResults('baujahr', false)">Baujahr ↓</button>
+        <button onclick="sortResults('ps', true)">PS ↑</button>
+        <button onclick="sortResults('ps', false)">PS ↓</button>
     </div>
 
     <!-- Ergebnisse -->
-    <div id="results"></div>
+    <div class="results" id="results"></div>
 
-    <!-- Zurück-Button -->
+    <!-- Zurück-Taste -->
     <button class="back-button" onclick="goBack()">Zurück</button>
 
     <script>
-        // Beispiel-Datenbank
-        const autos = [
-            { id: 1, marke: "VW", modell: "Golf", baujahr: 2018, kraftstoff: "Benzin", ps: 150, verbrauch: 6.5 },
-            { id: 2, marke: "VW", modell: "Polo", baujahr: 2020, kraftstoff: "Diesel", ps: 95, verbrauch: 4.8 },
-            { id: 3, marke: "BMW", modell: "3er", baujahr: 2019, kraftstoff: "Benzin", ps: 190, verbrauch: 7.2 },
-            { id: 4, marke: "Audi", modell: "A4", baujahr: 2021, kraftstoff: "Hybrid", ps: 204, verbrauch: 5.4 }
+        const cars = [
+            { id: 1, marke: "Audi", modell: "A4", baujahr: 2015, kraftstoff: "Benzin", ps: 150 },
+            { id: 2, marke: "Audi", modell: "A6", baujahr: 2018, kraftstoff: "Diesel", ps: 190 },
+            { id: 3, marke: "VW", modell: "Golf", baujahr: 2017, kraftstoff: "Benzin", ps: 110 },
+            { id: 4, marke: "BMW", modell: "320i", baujahr: 2016, kraftstoff: "Benzin", ps: 170 },
+            { id: 5, marke: "Mercedes", modell: "C200", baujahr: 2019, kraftstoff: "Diesel", ps: 160 }
         ];
 
-        let currentResults = [];
+        let filteredCars = [...cars];
 
-        // Ergebnisse anzeigen
-        function displayResults(results) {
-            currentResults = results;
-            const resultsContainer = document.getElementById("results");
-            resultsContainer.innerHTML = "";
-
-            if (results.length === 0) {
-                resultsContainer.innerHTML = "<p>Keine Ergebnisse gefunden.</p>";
-                return;
+        // URL-Parameter auslesen
+        function getQueryParams() {
+            const params = {};
+            const queryString = window.location.search.substring(1);
+            const pairs = queryString.split("&");
+            for (let pair of pairs) {
+                if (pair === "") continue;
+                const [key, value] = pair.split("=");
+                params[decodeURIComponent(key)] = decodeURIComponent(value || "");
             }
-
-            results.forEach(auto => {
-                const card = document.createElement("div");
-                card.classList.add("result-card");
-                card.innerHTML = `
-                    <h3>${auto.marke} ${auto.modell}</h3>
-                    <p>Baujahr: ${auto.baujahr}</p>
-                    <p>Kraftstoff: ${auto.kraftstoff}</p>
-                    <p>PS: ${auto.ps}</p>
-                    <p>Verbrauch: ${auto.verbrauch} l/100km</p>
-                    <button onclick="goToDetails(${auto.id})">Details ansehen</button>
-                `;
-                resultsContainer.appendChild(card);
-            });
+            return params;
         }
 
         // Filter anwenden
@@ -150,71 +165,67 @@
             const baujahr = document.getElementById("baujahr").value;
             const kraftstoff = document.getElementById("kraftstoff").value.toLowerCase();
 
-            const filtered = autos.filter(auto =>
-                (marke === "" || auto.marke.toLowerCase().includes(marke)) &&
-                (modell === "" || auto.modell.toLowerCase().includes(modell)) &&
-                (baujahr === "" || auto.baujahr.toString() === baujahr) &&
-                (kraftstoff === "" || auto.kraftstoff.toLowerCase().includes(kraftstoff))
+            filteredCars = cars.filter(car =>
+                (!marke || car.marke.toLowerCase().includes(marke)) &&
+                (!modell || car.modell.toLowerCase().includes(modell)) &&
+                (!baujahr || car.baujahr.toString() === baujahr) &&
+                (!kraftstoff || car.kraftstoff.toLowerCase().includes(kraftstoff))
             );
 
-            displayResults(filtered);
-            updateSort();
+            renderResults();
         }
 
-        // Sortierung anwenden
-        document.getElementById("sort").addEventListener("change", updateSort);
-        document.getElementById("direction").addEventListener("change", updateSort);
+        // Ergebnisse anzeigen
+        function renderResults() {
+            const resultsDiv = document.getElementById("results");
+            resultsDiv.innerHTML = "";
 
-        function updateSort() {
-            const sortBy = document.getElementById("sort").value;
-            const direction = document.getElementById("direction").value;
-            const directionLabel = document.getElementById("direction-label");
-            const directionSelect = document.getElementById("direction");
-
-            // Richtung nur bei Baujahr und PS anzeigen
-            if (sortBy === "baujahr" || sortBy === "ps") {
-                directionLabel.style.display = "inline-block";
-                directionSelect.style.display = "inline-block";
-            } else {
-                directionLabel.style.display = "none";
-                directionSelect.style.display = "none";
+            if (filteredCars.length === 0) {
+                resultsDiv.innerHTML = "<p>Keine Ergebnisse gefunden.</p>";
+                return;
             }
 
-            let sorted = [...currentResults];
-
-            sorted.sort((a, b) => {
-                let valA = a[sortBy];
-                let valB = b[sortBy];
-
-                if (sortBy === "ps" || sortBy === "baujahr") {
-                    valA = parseInt(valA);
-                    valB = parseInt(valB);
-                } else if (sortBy === "verbrauch") {
-                    valA = parseFloat(valA);
-                    valB = parseFloat(valB);
-                }
-
-                if (direction === "desc" && (sortBy === "ps" || sortBy === "baujahr")) {
-                    return valB - valA;
-                }
-                return valA - valB;
+            filteredCars.forEach(car => {
+                const card = document.createElement("div");
+                card.className = "result-card";
+                card.innerHTML = `
+                    <strong>${car.marke} ${car.modell}</strong><br>
+                    Baujahr: ${car.baujahr}, Kraftstoff: ${car.kraftstoff}, ${car.ps} PS
+                `;
+                card.onclick = () => goToDetails(car.id);
+                resultsDiv.appendChild(card);
             });
-
-            displayResults(sorted);
         }
 
-        // Details öffnen
+        // Sortieren
+        function sortResults(key, ascending) {
+            filteredCars.sort((a, b) => {
+                if (ascending) return a[key] - b[key];
+                else return b[key] - a[key];
+            });
+            renderResults();
+        }
+
+        // Initial laden mit Parametern
+        function init() {
+            const params = getQueryParams();
+            if (params.marke) document.getElementById("marke").value = params.marke;
+            if (params.modell) document.getElementById("modell").value = params.modell;
+            if (params.baujahr) document.getElementById("baujahr").value = params.baujahr;
+            if (params.kraftstoff) document.getElementById("kraftstoff").value = params.kraftstoff;
+
+            applyFilters();
+        }
+
         function goToDetails(id) {
             window.location.href = `details.html?id=${id}`;
         }
 
-        // Zurück zur Hauptseite
         function goBack() {
             window.location.href = "index.html";
         }
 
-        // Seite initial laden
-        applyFilters();
+        init();
     </script>
 </body>
 </html>
