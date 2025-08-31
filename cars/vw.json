@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "brand": "VW",
+    "model": "Golf",
+    "year": 2017,
+    "fuel": "Petrol",
+    "horsepower": 110
+  },
+  {
+    "id": 2,
+    "brand": "VW",
+    "model": "Passat",
+    "year": 2018,
+    "fuel": "Diesel",
+    "horsepower": 190
+  }
+]
