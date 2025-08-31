@@ -119,26 +119,6 @@
     <button class="back" onclick="history.back()">Zurück</button>
   </main>
 
-  <!-- Deine Datenquelle: autos.js (wenn vorhanden). Fallback, falls nicht -->
-  <script>
-    // Falls du eine separate autos.js hast, wird window.autos verwendet.
-    // Wenn nicht vorhanden, wird hier ein kleines Beispiel-Array als Fallback verwendet.
-    const fallbackAutos = [
-      { id:1, marke:"Audi", modell:"A6", baujahr:2021, kraftstoff:"Hybrid", ps:245 },
-      { id:2, marke:"VW", modell:"Golf", baujahr:2017, kraftstoff:"Benzin", ps:110 },
-      { id:3, marke:"BMW", modell:"320i", baujahr:2016, kraftstoff:"Benzin", ps:170 },
-      { id:4, marke:"Mercedes", modell:"C200", baujahr:2019, kraftstoff:"Diesel", ps:160 },
-      { id:5, marke:"Audi", modell:"Q5", baujahr:2020, kraftstoff:"Benzin", ps:249 },
-      { id:6, marke:"VW", modell:"Passat", baujahr:2018, kraftstoff:"Diesel", ps:190 },
-      { id:7, marke:"BMW", modell:"X3", baujahr:2021, kraftstoff:"Hybrid", ps:292 },
-      { id:8, marke:"Mercedes", modell:"E200", baujahr:2020, kraftstoff:"Benzin", ps:184 }
-    ];
-
-    // Wenn du autos.js einbindest, setze window.autos = [...];
-    // z.B. autos.js sollte `window.autos = [ {id:1,...}, ... ];`
-    const autos = window.autos && Array.isArray(window.autos) && window.autos.length ? window.autos : fallbackAutos;
-  </script>
-
   <script>
     // --- Utility: Query-Parameter parsen (URL hat Vorrang vor storage) ---
     function getQueryParams() {
