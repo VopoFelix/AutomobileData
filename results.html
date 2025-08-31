@@ -3,13 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>Suchergebnisse</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f0f0f5; }
-        h1 { text-align: center; }
-        ul { list-style-type: none; padding: 0; max-width: 600px; margin: auto; }
-        li { background-color: white; margin: 10px 0; padding: 15px; border-radius: 8px; cursor: pointer; box-shadow: 0 0 5px rgba(0,0,0,0.1); }
-        li:hover { background-color: #e0e0ff; }
-    </style>
 </head>
 <body>
     <h1>Suchergebnisse</h1>
@@ -19,30 +12,33 @@
         const params = new URLSearchParams(window.location.search);
         const marke = params.get('marke');
         const modell = params.get('modell');
+        const baujahr = params.get('baujahr');
+        const ps = params.get('ps');
 
-        // Dummy-Daten für das Layout
-        const dummyAutos = [
-            { marke: 'VW', modell: 'Golf', baujahr: 2018 },
-            { marke: 'VW', modell: 'Golf', baujahr: 2020 },
-            { marke: 'VW', modell: 'Passat', baujahr: 2019 },
-            { marke: 'Audi', modell: 'A4', baujahr: 2020 }
-        ];
+        fetch('autos.json')
+            .then(response => response.json())
+            .then(autos => {
+                const filtered = autos.filter(auto => {
+                    return (!marke || auto.marke.toLowerCase().includes(marke.toLowerCase()))
+                        && (!modell || auto.modell.toLowerCase().includes(modell.toLowerCase()))
+                        && (!baujahr || auto.baujahr == baujahr)
+                        && (!ps || auto.ps == ps);
+                });
 
-        const filtered = dummyAutos.filter(auto => {
-            return (!marke || auto.marke.toLowerCase().includes(marke.toLowerCase()))
-                && (!modell || auto.modell.toLowerCase().includes(modell.toLowerCase()));
-        });
+                const ul = document.getElementById('results');
+                filtered.forEach(auto => {
+                    const li = document.createElement('li');
+                    li.textContent = `${auto.marke} ${auto.modell} (${auto.baujahr})`;
+                    li.onclick = () => {
+                        window.location.href = 'details.html?id=' + auto.id;
+                    };
+                    ul.appendChild(li);
+                });
 
-        const ul = document.getElementById('results');
-        filtered.forEach(auto => {
-            const li = document.createElement('li');
-            li.textContent = `${auto.marke} ${auto.modell} (${auto.baujahr})`;
-            li.onclick = () => {
-                // Platzhalter für Detailseite
-                window.location.href = 'details.html?marke=' + auto.marke + '&modell=' + auto.modell + '&baujahr=' + auto.baujahr;
-            };
-            ul.appendChild(li);
-        });
+                if(filtered.length === 0) {
+                    ul.innerHTML = '<li>Keine Autos gefunden</li>';
+                }
+            });
     </script>
 </body>
 </html>
