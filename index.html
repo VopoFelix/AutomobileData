@@ -19,18 +19,10 @@
 </header>
 
 <div class="search-bar">
-    <input list="markenList" id="marke" placeholder="Marke">
-    <datalist id="markenList"></datalist>
-
-    <input list="modelleList" id="modell" placeholder="Modell">
-    <datalist id="modelleList"></datalist>
-
-    <input list="baujahrList" id="baujahr" placeholder="Baujahr">
-    <datalist id="baujahrList"></datalist>
-
-    <input list="kraftstoffList" id="kraftstoff" placeholder="Kraftstoffart">
-    <datalist id="kraftstoffList"></datalist>
-
+    <input id="marke" placeholder="Marke">
+    <input id="modell" placeholder="Modell">
+    <input id="baujahr" placeholder="Baujahr">
+    <input id="kraftstoff" placeholder="Kraftstoffart">
     <button id="searchBtn">Suchen</button>
 </div>
 
@@ -45,11 +37,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const baujahrInput = document.getElementById('baujahr');
     const kraftstoffInput = document.getElementById('kraftstoff');
 
-    const markenList = document.getElementById('markenList');
-    const modelleList = document.getElementById('modelleList');
-    const baujahrList = document.getElementById('baujahrList');
-    const kraftstoffList = document.getElementById('kraftstoffList');
-
     const brandsGrid = document.getElementById('brandsGrid');
     const searchBtn = document.getElementById('searchBtn');
 
@@ -57,44 +44,25 @@ document.addEventListener('DOMContentLoaded', () => {
         .then(response => response.json())
         .then(data => {
             autos = data;
-            populateDatalists();
             populateBrandsGrid();
         })
         .catch(err => console.error("Fehler beim Laden von autos.json:", err));
-
-    function populateDatalists() {
-        // Marken
-        Array.from(new Set(autos.map(a => a.marke))).sort()
-            .forEach(m => markenList.appendChild(new Option(m)));
-        // Modelle
-        Array.from(new Set(autos.map(a => a.modell))).sort()
-            .forEach(m => modelleList.appendChild(new Option(m)));
-        // Baujahre
-        Array.from(new Set(autos.map(a => a.baujahr))).sort((a,b)=>a-b)
-            .forEach(b => baujahrList.appendChild(new Option(b)));
-        // Kraftstoff
-        Array.from(new Set(autos.map(a => a.kraftstoff).filter(k=>k))).sort()
-            .forEach(k => kraftstoffList.appendChild(new Option(k)));
-    }
 
     function updateDependentFields() {
         const selectedMarke = markeInput.value.toLowerCase();
         const filteredAutos = selectedMarke ? autos.filter(a => a.marke.toLowerCase().includes(selectedMarke)) : autos;
 
-        // Modelle
-        modelleList.innerHTML = '';
-        Array.from(new Set(filteredAutos.map(a => a.modell))).sort()
-            .forEach(m => modelleList.appendChild(new Option(m)));
+        // Modell
+        const modelle = Array.from(new Set(filteredAutos.map(a => a.modell))).sort();
+        modellInput.placeholder = modelle.length ? `z.B. ${modelle[0]}` : "Modell";
 
         // Baujahr
-        baujahrList.innerHTML = '';
-        Array.from(new Set(filteredAutos.map(a => a.baujahr))).sort((a,b)=>a-b)
-            .forEach(b => baujahrList.appendChild(new Option(b)));
+        const baujahre = Array.from(new Set(filteredAutos.map(a => a.baujahr))).sort((a,b)=>a-b);
+        baujahrInput.placeholder = baujahre.length ? `z.B. ${baujahre[0]}` : "Baujahr";
 
         // Kraftstoff
-        kraftstoffList.innerHTML = '';
-        Array.from(new Set(filteredAutos.map(a => a.kraftstoff).filter(k=>k))).sort()
-            .forEach(k => kraftstoffList.appendChild(new Option(k)));
+        const kraftstoffe = Array.from(new Set(filteredAutos.map(a => a.kraftstoff).filter(k=>k))).sort();
+        kraftstoffInput.placeholder = kraftstoffe.length ? `z.B. ${kraftstoffe[0]}` : "Kraftstoffart";
     }
 
     markeInput.addEventListener('input', updateDependentFields);
