@@ -1,101 +1,117 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>Fahrzeugdetails - Automobile-Data</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f9f9f9;
-        }
-        h1 {
-            text-align: center;
-        }
-        .car-details {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-        }
-        .category {
-            margin: 20px 0;
-            padding: 10px;
-            border-top: 1px solid #ddd;
-        }
-        .category h2 {
-            font-size: 1.2em;
-            margin-bottom: 10px;
-            color: #333;
-        }
-        .category ul {
-            list-style-type: none;
-            padding: 0;
-        }
-        .category li {
-            margin: 5px 0;
-        }
-        .back-button {
-            display: block;
-            margin: 30px auto 0 auto;
-            padding: 10px 20px;
-            background-color: #ddd;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-        }
-        .back-button:hover {
-            background-color: #bbb;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Fahrzeugdetails - Automobile-Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    .car-details {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .car-details h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+    .category {
+      margin: 20px 0;
+      padding: 10px;
+      border-top: 1px solid #ddd;
+    }
+    .category h3 {
+      font-size: 1.1em;
+      margin-bottom: 8px;
+      color: #333;
+    }
+    .category ul {
+      list-style-type: none;
+      padding: 0;
+      margin: 0;
+    }
+    .category li {
+      margin: 4px 0;
+    }
+    .back-button {
+      display: block;
+      margin: 30px auto 0 auto;
+      padding: 10px 20px;
+      background-color: #ddd;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .back-button:hover {
+      background-color: #bbb;
+    }
+  </style>
 </head>
 <body>
-    <h1>Fahrzeugdetails</h1>
-    <div class="car-details" id="carDetails"></div>
-    <button class="back-button" onclick="goBack()">Zurück zu den Ergebnissen</button>
+  <h1>Fahrzeugdetails</h1>
+  <div class="car-details" id="carDetails"></div>
+  <button class="back-button" onclick="goBack()">Zurück</button>
 
-    <script src="autos.js"></script>
-    <script>
-        function getQueryParams() {
-            const params = {};
-            window.location.search.substring(1).split("&").forEach(pair => {
-                const [key, value] = pair.split("=");
-                if (key) params[key] = decodeURIComponent(value || "");
-            });
-            return params;
+  <script src="autos.js"></script>
+  <script>
+    function getQueryParams() {
+      const params = {};
+      window.location.search.substring(1).split("&").forEach(pair => {
+        const [key, value] = pair.split("=");
+        if (key) params[key] = decodeURIComponent(value || "");
+      });
+      return params;
+    }
+
+    function renderCarDetails() {
+      const params = getQueryParams();
+      const carId = parseInt(params.id, 10);
+      const car = autos.find(a => a.id === carId);
+
+      if (!car) {
+        document.getElementById("carDetails").innerHTML = "<p>Auto nicht gefunden.</p>";
+        return;
+      }
+
+      let html = `<h2>${car.marke} ${car.modell} (${car.baujahr})</h2>`;
+
+      // Prüfen ob Kategorien existieren
+      if (car.kategorien) {
+        for (const [kategorie, details] of Object.entries(car.kategorien)) {
+          html += `<div class="category"><h3>${kategorie}</h3><ul>`;
+          for (const [key, value] of Object.entries(details)) {
+            html += `<li><strong>${key}:</strong> ${value}</li>`;
+          }
+          html += "</ul></div>";
         }
-
-        function renderCarDetails() {
-            const params = getQueryParams();
-            const carId = parseInt(params.id, 10);
-            const car = autos.find(a => a.id === carId);
-
-            if (!car) {
-                document.getElementById("carDetails").innerHTML = "<p>Auto nicht gefunden.</p>";
-                return;
-            }
-
-            let html = `<h2>${car.marke} ${car.modell} (${car.baujahr})</h2>`;
-            
-            // Kategorien dynamisch darstellen
-            for (const [kategorie, details] of Object.entries(car.kategorien)) {
-                html += `<div class="category"><h2>${kategorie}</h2><ul>`;
-                for (const [key, value] of Object.entries(details)) {
-                    html += `<li><strong>${key}:</strong> ${value}</li>`;
-                }
-                html += "</ul></div>";
-            }
-
-            document.getElementById("carDetails").innerHTML = html;
+      } else {
+        html += `<div class="category"><h3>Allgemeine Daten</h3><ul>`;
+        for (const [key, value] of Object.entries(car)) {
+          if (key !== "id" && key !== "marke" && key !== "modell" && key !== "baujahr") {
+            html += `<li><strong>${key}:</strong> ${value}</li>`;
+          }
         }
+        html += "</ul></div>`;
+      }
 
-        function goBack() {
-            window.location.href = "results.html";
-        }
+      document.getElementById("carDetails").innerHTML = html;
+    }
 
-        renderCarDetails();
-    </script>
+    function goBack() {
+      history.back();
+    }
+
+    renderCarDetails();
+  </script>
 </body>
 </html>
