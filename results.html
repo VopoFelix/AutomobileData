@@ -1,155 +1,125 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>Suchergebnisse - Automobile-Data</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f9f9f9;
-        }
-        h1 {
-            text-align: center;
-        }
-        .search-container, .sort-container {
-            display: flex;
-            justify-content: center;
-            margin: 10px 0;
-            gap: 10px;
-        }
-        .car-card {
-            border: 1px solid #ccc;
-            background: white;
-            padding: 10px;
-            margin: 10px;
-            cursor: pointer;
-        }
-        .car-card:hover {
-            background: #eee;
-        }
-        #results {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-            gap: 10px;
-        }
-        .back-button {
-            display: block;
-            margin: 20px auto;
-            padding: 10px 20px;
-            background-color: #ddd;
-            border: none;
-            cursor: pointer;
-        }
-        .back-button:hover {
-            background-color: #bbb;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Suchergebnisse - Automobile-Data</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background-color: #f9f9f9;
+    }
+    h1 {
+      text-align: center;
+    }
+    .results {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .car-card {
+      background: white;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 15px;
+      margin: 10px 0;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .car-card h3 {
+      margin: 0 0 10px 0;
+    }
+    .car-card button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: none;
+      background-color: #ddd;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .car-card button:hover {
+      background-color: #bbb;
+    }
+    .back-button {
+      display: block;
+      margin: 30px auto;
+      padding: 10px 20px;
+      background-color: #ddd;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    .back-button:hover {
+      background-color: #bbb;
+    }
+  </style>
 </head>
 <body>
-    <h1>Suchergebnisse</h1>
+  <h1>Suchergebnisse</h1>
+  <div class="results" id="results"></div>
+  <button class="back-button" onclick="goBack()">Zurück</button>
 
-    <!-- Suchfelder -->
-    <div class="search-container">
-        <input type="text" id="marke" placeholder="Marke">
-        <input type="text" id="modell" placeholder="Modell">
-        <input type="text" id="baujahr" placeholder="Baujahr">
-        <input type="text" id="kraftstoff" placeholder="Kraftstoffart">
-        <button onclick="renderResults()">Suchen</button>
-    </div>
+  <script src="autos.js"></script>
+  <script>
+    function getQueryParams() {
+      const params = {};
+      window.location.search.substring(1).split("&").forEach(pair => {
+        const [key, value] = pair.split("=");
+        if (key) params[key] = decodeURIComponent(value || "");
+      });
+      return params;
+    }
 
-    <!-- Sortierung -->
-    <div class="sort-container">
-        <label for="sort">Sortieren nach:</label>
-        <select id="sort" onchange="renderResults()">
-            <option value="">-- Keine Sortierung --</option>
-            <option value="baujahr-asc">Baujahr (aufsteigend)</option>
-            <option value="baujahr-desc">Baujahr (absteigend)</option>
-            <option value="ps-asc">PS (aufsteigend)</option>
-            <option value="ps-desc">PS (absteigend)</option>
-            <option value="name-asc">Name (A–Z)</option>
-            <option value="name-desc">Name (Z–A)</option>
-        </select>
-    </div>
+    function renderResults() {
+      const params = getQueryParams();
+      let filtered = autos;
 
-    <!-- Ergebnisse -->
-    <div id="results"></div>
+      // Filter anwenden (nur wenn Parameter gesetzt sind)
+      if (params.marke) {
+        filtered = filtered.filter(a => a.marke.toLowerCase().includes(params.marke.toLowerCase()));
+      }
+      if (params.modell) {
+        filtered = filtered.filter(a => a.modell.toLowerCase().includes(params.modell.toLowerCase()));
+      }
+      if (params.baujahr) {
+        filtered = filtered.filter(a => String(a.baujahr) === params.baujahr);
+      }
+      if (params.kraftstoff) {
+        filtered = filtered.filter(a => a.kraftstoff && a.kraftstoff.toLowerCase().includes(params.kraftstoff.toLowerCase()));
+      }
 
-    <!-- Zurück Button -->
-    <button class="back-button" onclick="goBack()">Zurück</button>
+      const container = document.getElementById("results");
+      container.innerHTML = "";
 
-    <script src="autos.js"></script>
-    <script>
-        function getQueryParams() {
-            const params = {};
-            window.location.search.substring(1).split("&").forEach(pair => {
-                const [key, value] = pair.split("=");
-                if (key) params[key] = decodeURIComponent(value || "");
-            });
-            return params;
-        }
+      if (filtered.length === 0) {
+        container.innerHTML = "<p>Keine Ergebnisse gefunden.</p>";
+        return;
+      }
 
-        function filterCars() {
-            const params = getQueryParams();
-            const marke = document.getElementById("marke").value || params.marke || "";
-            const modell = document.getElementById("modell").value || params.modell || "";
-            const baujahr = document.getElementById("baujahr").value || params.baujahr || "";
-            const kraftstoff = document.getElementById("kraftstoff").value || params.kraftstoff || "";
+      filtered.forEach(car => {
+        const card = document.createElement("div");
+        card.className = "car-card";
 
-            return autos.filter(auto =>
-                (marke === "" || auto.marke.toLowerCase().includes(marke.toLowerCase())) &&
-                (modell === "" || auto.modell.toLowerCase().includes(modell.toLowerCase())) &&
-                (baujahr === "" || auto.baujahr.toString() === baujahr) &&
-                (kraftstoff === "" || auto.kraftstoff.toLowerCase().includes(kraftstoff.toLowerCase()))
-            );
-        }
+        // Zeige nur Basisinfos
+        card.innerHTML = `
+          <h3>${car.marke} ${car.modell}</h3>
+          <p><strong>Baujahr:</strong> ${car.baujahr || "-"}</p>
+          <p><strong>PS:</strong> ${car.ps || "-"}</p>
+          <p><strong>Kraftstoff:</strong> ${car.kraftstoff || "-"}</p>
+          <button onclick="viewDetails(${car.id})">Details ansehen</button>
+        `;
 
-        function renderResults() {
-            const resultsContainer = document.getElementById("results");
-            resultsContainer.innerHTML = "";
+        container.appendChild(card);
+      });
+    }
 
-            let filteredCars = filterCars();
+    function viewDetails(id) {
+      window.location.href = "details.html?id=" + id;
+    }
 
-            // Sortierung anwenden
-            const sortValue = document.getElementById("sort").value;
-            if (sortValue === "baujahr-asc") {
-                filteredCars.sort((a, b) => a.baujahr - b.baujahr);
-            } else if (sortValue === "baujahr-desc") {
-                filteredCars.sort((a, b) => b.baujahr - a.baujahr);
-            } else if (sortValue === "ps-asc") {
-                filteredCars.sort((a, b) => a.ps - b.ps);
-            } else if (sortValue === "ps-desc") {
-                filteredCars.sort((a, b) => b.ps - a.ps);
-            } else if (sortValue === "name-asc") {
-                filteredCars.sort((a, b) => (a.marke + " " + a.modell).localeCompare(b.marke + " " + b.modell));
-            } else if (sortValue === "name-desc") {
-                filteredCars.sort((a, b) => (b.marke + " " + b.modell).localeCompare(a.marke + " " + a.modell));
-            }
+    function goBack() {
+      history.back();
+    }
 
-            // Ergebnisse anzeigen
-            if (filteredCars.length === 0) {
-                resultsContainer.innerHTML = "<p>Keine Ergebnisse gefunden.</p>";
-                return;
-            }
-
-            filteredCars.forEach(car => {
-                const div = document.createElement("div");
-                div.className = "car-card";
-                div.textContent = `${car.marke} ${car.modell} (${car.baujahr}) - ${car.kraftstoff} - ${car.ps} PS`;
-                div.onclick = () => {
-                    const url = `details.html?id=${car.id}`;
-                    window.location.href = url;
-                };
-                resultsContainer.appendChild(div);
-            });
-        }
-
-        function goBack() {
-            window.location.href = "index.html";
-        }
-
-        // Seite starten mit Ergebnissen
-        renderResults();
-    </script>
+    renderResults();
+  </script>
 </body>
 </html>
