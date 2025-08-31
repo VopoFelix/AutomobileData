@@ -10,7 +10,6 @@
             padding: 0;
             background-color: #f9f9f9;
         }
-
         header {
             background-color: #333;
             color: white;
@@ -19,7 +18,6 @@
             font-size: 24px;
             font-weight: bold;
         }
-
         .search-container {
             display: flex;
             justify-content: center;
@@ -27,14 +25,12 @@
             gap: 10px;
             margin: 20px;
         }
-
         .search-container input {
             padding: 8px;
             font-size: 16px;
             border: 1px solid #ccc;
             border-radius: 5px;
         }
-
         .search-container button {
             padding: 8px 15px;
             font-size: 16px;
@@ -44,18 +40,15 @@
             border-radius: 5px;
             cursor: pointer;
         }
-
         .search-container button:hover {
             background-color: #555;
         }
-
         .sort-buttons {
             display: flex;
             justify-content: center;
             gap: 15px;
             margin: 10px 0;
         }
-
         .sort-buttons button {
             padding: 8px 15px;
             font-size: 14px;
@@ -65,15 +58,12 @@
             border-radius: 5px;
             cursor: pointer;
         }
-
         .sort-buttons button:hover {
             background-color: #888;
         }
-
         .results {
             margin: 20px;
         }
-
         .result-card {
             background: white;
             border: 1px solid #ccc;
@@ -83,11 +73,9 @@
             cursor: pointer;
             transition: background 0.3s;
         }
-
         .result-card:hover {
             background: #f0f0f0;
         }
-
         .back-button {
             display: block;
             margin: 30px auto;
@@ -100,7 +88,6 @@
             cursor: pointer;
             text-align: center;
         }
-
         .back-button:hover {
             background-color: #555;
         }
@@ -135,12 +122,9 @@
     <button class="back-button" onclick="goBack()">Zurück</button>
 
     <script>
+        // Beispiel-Datenbank
         const cars = [
-            { id: 1, marke: "Audi", modell: "A4", baujahr: 2015, kraftstoff: "Benzin", ps: 150 },
-            { id: 2, marke: "Audi", modell: "A6", baujahr: 2018, kraftstoff: "Diesel", ps: 190 },
-            { id: 3, marke: "VW", modell: "Golf", baujahr: 2017, kraftstoff: "Benzin", ps: 110 },
-            { id: 4, marke: "BMW", modell: "320i", baujahr: 2016, kraftstoff: "Benzin", ps: 170 },
-            { id: 5, marke: "Mercedes", modell: "C200", baujahr: 2019, kraftstoff: "Diesel", ps: 160 }
+            // Füge hier die 8 Autos aus deiner Beispiel-Datenbank ein
         ];
 
         let filteredCars = [...cars];
