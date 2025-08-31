@@ -57,28 +57,34 @@
                 .then(response => response.json())
                 .then(data => {
                     autos = data;
-                    populateDatalists();
+                    populateMarken();
                     populateBrandsGrid();
                 })
                 .catch(err => console.error("Fehler beim Laden von autos.json:", err));
 
-            function populateDatalists() {
-                // Marken
+            function populateMarken() {
                 const marken = Array.from(new Set(autos.map(a => a.marke))).sort();
                 marken.forEach(m => markenList.appendChild(new Option(m)));
+            }
+
+            function updateDependentFields() {
+                const selectedMarke = markeInput.value;
+                const filteredAutos = selectedMarke ? autos.filter(a => a.marke.toLowerCase() === selectedMarke.toLowerCase()) : autos;
 
                 // Modelle
-                const modelle = Array.from(new Set(autos.map(a => a.modell))).sort();
-                modelle.forEach(m => modelleList.appendChild(new Option(m)));
+                modelleList.innerHTML = '';
+                Array.from(new Set(filteredAutos.map(a => a.modell))).sort().forEach(m => modelleList.appendChild(new Option(m)));
 
-                // Baujahre
-                const baujahre = Array.from(new Set(autos.map(a => a.baujahr))).sort((a,b)=>a-b);
-                baujahre.forEach(b => baujahrList.appendChild(new Option(b)));
+                // Baujahr
+                baujahrList.innerHTML = '';
+                Array.from(new Set(filteredAutos.map(a => a.baujahr))).sort((a,b)=>a-b).forEach(bj => baujahrList.appendChild(new Option(bj)));
 
-                // Kraftstoffarten
-                const kraftstoffe = Array.from(new Set(autos.map(a => a.kraftstoff).filter(k => k))).sort();
-                kraftstoffe.forEach(k => kraftstoffList.appendChild(new Option(k)));
+                // Kraftstoff
+                kraftstoffList.innerHTML = '';
+                Array.from(new Set(filteredAutos.map(a => a.kraftstoff).filter(k=>k))).sort().forEach(k => kraftstoffList.appendChild(new Option(k)));
             }
+
+            markeInput.addEventListener('input', updateDependentFields);
 
             function populateBrandsGrid() {
                 const brands = Array.from(new Set(autos.map(a => a.marke))).sort();
@@ -87,7 +93,9 @@
                     div.className = 'brand';
                     div.textContent = brand;
                     div.onclick = () => {
-                        window.location.href = 'results.html?marke=' + encodeURIComponent(brand);
+                        markeInput.value = brand;
+                        updateDependentFields();
+                        searchBtn.click();
                     };
                     brandsGrid.appendChild(div);
                 });
