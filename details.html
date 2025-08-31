@@ -1,135 +1,133 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="UTF-8">
-<title>Autodetails</title>
-<style>
-body { font-family: Arial, sans-serif; margin:20px; background-color:#f0f0f5; }
-header { background-color:#333; color:white; padding:20px; text-align:center; }
-.container { max-width:800px; margin:auto; background-color:white; padding:20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-.back { display:block; margin:20px auto; padding:10px 20px; cursor:pointer; }
-.category { margin-bottom:20px; }
-.category h2 { background-color:#e0e0ff; padding:10px; border-radius:5px; }
-.details-grid { display:grid; grid-template-columns: 1fr 2fr; gap:10px; margin-top:10px; }
-.details-grid div { padding:5px 0; }
-.image-container { text-align:center; margin-bottom:20px; }
-.image-container img { max-width:100%; height:auto; border-radius:8px; }
-</style>
+    <meta charset="UTF-8">
+    <title>Fahrzeugdetails - Automobile-Data</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+            margin-top: 20px;
+            color: #333;
+        }
+
+        .detail-item {
+            margin: 8px 0;
+        }
+
+        .back-button {
+            display: block;
+            margin: 30px auto 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .back-button:hover {
+            background-color: #555;
+        }
+    </style>
 </head>
 <body>
-<header>
-    <h1>Autodetails</h1>
-</header>
+    <header>
+        Fahrzeugdetails - Automobile-Data
+    </header>
 
-<div class="container">
-    <div class="image-container">
-        <img id="autoBild" src="" alt="Auto Bild" />
-    </div>
+    <div class="container" id="details"></div>
 
-    <!-- Basisdaten -->
-    <div class="category">
-        <h2>Basisdaten</h2>
-        <div class="details-grid">
-            <div>Marke:</div><div id="marke"></div>
-            <div>Modell:</div><div id="modell"></div>
-            <div>Baujahr:</div><div id="baujahr"></div>
-            <div>Kraftstoff:</div><div id="kraftstoff"></div>
-        </div>
-    </div>
+    <button class="back-button" onclick="goBack()">Zurück</button>
 
-    <!-- Karosserie -->
-    <div class="category">
-        <h2>Karosserie</h2>
-        <div class="details-grid">
-            <div>Länge:</div><div id="laenge"></div>
-            <div>Breite:</div><div id="breite"></div>
-            <div>Höhe:</div><div id="hoehe"></div>
-            <div>Gewicht:</div><div id="gewicht"></div>
-        </div>
-    </div>
+    <script>
+        const cars = [
+            { 
+                id: 1, 
+                marke: "Audi", modell: "A4", baujahr: 2015, kraftstoff: "Benzin", ps: 150,
+                karosserie: { länge: "4726 mm", breite: "1842 mm", höhe: "1427 mm" },
+                motor: { hubraum: "1984 ccm", zylinder: 4, verbrauch: "6,5 l/100km" }
+            },
+            { 
+                id: 2, 
+                marke: "VW", modell: "Golf", baujahr: 2017, kraftstoff: "Benzin", ps: 110,
+                karosserie: { länge: "4255 mm", breite: "1799 mm", höhe: "1452 mm" },
+                motor: { hubraum: "1395 ccm", zylinder: 4, verbrauch: "5,2 l/100km" }
+            }
+        ];
 
-    <!-- Motor -->
-    <div class="category">
-        <h2>Motor</h2>
-        <div class="details-grid">
-            <div>PS:</div><div id="ps"></div>
-            <div>Hubraum:</div><div id="hubraum"></div>
-            <div>Verbrauch:</div><div id="verbrauch"></div>
-            <div>Motorart:</div><div id="motorart"></div>
-        </div>
-    </div>
+        function getQueryParams() {
+            const params = {};
+            const queryString = window.location.search.substring(1);
+            const pairs = queryString.split("&");
+            for (let pair of pairs) {
+                if (pair === "") continue;
+                const [key, value] = pair.split("=");
+                params[decodeURIComponent(key)] = decodeURIComponent(value || "");
+            }
+            return params;
+        }
 
-    <!-- Getriebe -->
-    <div class="category">
-        <h2>Getriebe</h2>
-        <div class="details-grid">
-            <div>Getriebeart:</div><div id="getriebeart"></div>
-            <div>Gänge:</div><div id="gaenge"></div>
-        </div>
-    </div>
-
-    <!-- Extras -->
-    <div class="category">
-        <h2>Extras</h2>
-        <div class="details-grid">
-            <div>Besonderheiten:</div><div id="extras"></div>
-        </div>
-    </div>
-
-    <button class="back" onclick="window.history.back()">Zurück</button>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    const autoId = params.get('id');
-
-    fetch('autos.json')
-        .then(response => response.json())
-        .then(autos => {
-            const auto = autos.find(a => a.id == autoId);
-            if (!auto) {
-                alert("Auto nicht gefunden");
+        function loadDetails() {
+            const params = getQueryParams();
+            const car = cars.find(c => c.id == params.id);
+            if (!car) {
+                document.getElementById("details").innerHTML = "<p>Fahrzeug nicht gefunden.</p>";
                 return;
             }
 
-            // Basisdaten
-            document.getElementById('marke').textContent = auto.marke || '-';
-            document.getElementById('modell').textContent = auto.modell || '-';
-            document.getElementById('baujahr').textContent = auto.baujahr || '-';
-            document.getElementById('kraftstoff').textContent = auto.kraftstoff || '-';
+            document.getElementById("details").innerHTML = `
+                <h2>Allgemein</h2>
+                <div class="detail-item"><strong>Marke:</strong> ${car.marke}</div>
+                <div class="detail-item"><strong>Modell:</strong> ${car.modell}</div>
+                <div class="detail-item"><strong>Baujahr:</strong> ${car.baujahr}</div>
+                <div class="detail-item"><strong>Kraftstoff:</strong> ${car.kraftstoff}</div>
+                <div class="detail-item"><strong>Leistung:</strong> ${car.ps} PS</div>
 
-            // Karosserie
-            document.getElementById('laenge').textContent = auto.laenge || '-';
-            document.getElementById('breite').textContent = auto.breite || '-';
-            document.getElementById('hoehe').textContent = auto.hoehe || '-';
-            document.getElementById('gewicht').textContent = auto.gewicht || '-';
+                <h2>Karosserie</h2>
+                <div class="detail-item"><strong>Länge:</strong> ${car.karosserie.länge}</div>
+                <div class="detail-item"><strong>Breite:</strong> ${car.karosserie.breite}</div>
+                <div class="detail-item"><strong>Höhe:</strong> ${car.karosserie.höhe}</div>
 
-            // Motor
-            document.getElementById('ps').textContent = auto.ps || '-';
-            document.getElementById('hubraum').textContent = auto.hubraum || '-';
-            document.getElementById('verbrauch').textContent = auto.verbrauch || '-';
-            document.getElementById('motorart').textContent = auto.motorart || '-';
+                <h2>Motor</h2>
+                <div class="detail-item"><strong>Hubraum:</strong> ${car.motor.hubraum}</div>
+                <div class="detail-item"><strong>Zylinder:</strong> ${car.motor.zylinder}</div>
+                <div class="detail-item"><strong>Verbrauch:</strong> ${car.motor.verbrauch}</div>
+            `;
+        }
 
-            // Getriebe
-            document.getElementById('getriebeart').textContent = auto.getriebeart || '-';
-            document.getElementById('gaenge').textContent = auto.gaenge || '-';
+        function goBack() {
+            window.location.href = "results.html";
+        }
 
-            // Extras
-            document.getElementById('extras').textContent = auto.extras || '-';
-
-            // Bild
-            const bild = document.getElementById('autoBild');
-            if (auto.bild) {
-                bild.src = auto.bild;
-                bild.alt = `${auto.marke} ${auto.modell}`;
-            } else {
-                bild.src = 'placeholder.jpg';
-                bild.alt = 'Kein Bild vorhanden';
-            }
-        })
-        .catch(err => console.error("Fehler beim Laden von autos.json:", err));
-});
-</script>
+        loadDetails();
+    </script>
 </body>
 </html>
