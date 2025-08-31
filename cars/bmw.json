@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "brand": "BMW",
+    "model": "320i",
+    "year": 2016,
+    "fuel": "Petrol",
+    "horsepower": 170
+  },
+  {
+    "id": 2,
+    "brand": "BMW",
+    "model": "X3",
+    "year": 2021,
+    "fuel": "Hybrid",
+    "horsepower": 292
+  }
+]
