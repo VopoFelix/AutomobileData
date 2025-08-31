@@ -68,22 +68,125 @@
     <button class="back-button" onclick="goBack()">Zurück</button>
 
     <script>
-        const cars = [
-            { 
-                id: 1, 
-                marke: "Audi", modell: "A4", baujahr: 2015, kraftstoff: "Benzin", ps: 150,
-                kategorien: {
-                    "Karosserie": { länge: "4726 mm", breite: "1842 mm", höhe: "1427 mm" },
-                    "Motor": { hubraum: "1984 ccm", zylinder: 4, verbrauch: "6,5 l/100km" },
-                    "Getriebe": { typ: "Manuell", gänge: 6 }
-                }
-            },
-            { 
-                id: 2, 
-                marke: "VW", modell: "Golf", baujahr: 2017, kraftstoff: "Benzin", ps: 110,
-                kategorien: {
-                    "Karosserie": { länge: "4255 mm", breite: "1799 mm", höhe: "1452 mm" },
-                    "Motor": { hubraum: "1395 ccm", zylinder: 4, verbrauch: "5,2 l/100km" }
+const cars = [
+    {
+        id: 1,
+        marke: "Audi",
+        modell: "A6",
+        baujahr: 2021,
+        kraftstoff: "Hybrid",
+        ps: 245,
+        kategorien: {
+            "Karosserie": { länge: "4939 mm", breite: "1874 mm", höhe: "1461 mm", türen: 4, sitze: 5 },
+            "Motor": { hubraum: "1984 ccm", zylinder: 4, ps: 245, drehmoment: "370 Nm", verbrauch: "5,9 l/100km" },
+            "Getriebe": { typ: "Automatik", gänge: 7, allrad: "Quattro" },
+            "Fahrwerk": { federung: "Mehrlenker hinten", bremsen: "Scheibenbremse v/h", lenkung: "Servolenkung elektrisch" },
+            "Sicherheit": { airbags: 6, abs: "Ja", esp: "Ja", assistenzsysteme: "Abstandsregeltempomat, Spurhalteassistent" },
+            "Infotainment": { display: "10,1 Zoll", bluetooth: "Ja", navigationssystem: "Ja", soundanlage: "Bang & Olufsen" },
+            "Extras": { panorama_dach: "Ja", sitzheizung: "Vorne & Hinten", led_scheinwerfer: "Ja", parkassistent: "Ja" }
+        }
+    },
+    {
+        id: 2,
+        marke: "VW",
+        modell: "Golf",
+        baujahr: 2017,
+        kraftstoff: "Benzin",
+        ps: 110,
+        kategorien: {
+            "Karosserie": { länge: "4255 mm", breite: "1799 mm", höhe: "1452 mm", türen: 5, sitze: 5 },
+            "Motor": { hubraum: "1395 ccm", zylinder: 4, ps: 110, drehmoment: "200 Nm", verbrauch: "5,2 l/100km" },
+            "Getriebe": { typ: "Manuell", gänge: 6, allrad: "Nein" },
+            "Fahrwerk": { federung: "McPherson vorne", bremsen: "Scheibenbremse v/h", lenkung: "Servolenkung elektrisch" },
+            "Sicherheit": { airbags: 6, abs: "Ja", esp: "Ja", assistenzsysteme: "Spurhalteassistent" },
+            "Infotainment": { display: "8 Zoll", bluetooth: "Ja", navigationssystem: "Optional", soundanlage: "Standard" },
+            "Extras": { panorama_dach: "Nein", sitzheizung: "Vorne optional", led_scheinwerfer: "Nein", parkassistent: "Ja" }
+        }
+    },
+    {
+        id: 3,
+        marke: "BMW",
+        modell: "320i",
+        baujahr: 2016,
+        kraftstoff: "Benzin",
+        ps: 170,
+        kategorien: {
+            "Karosserie": { länge: "4624 mm", breite: "1800 mm", höhe: "1435 mm", türen: 4, sitze: 5 },
+            "Motor": { hubraum: "1998 ccm", zylinder: 4, ps: 170, drehmoment: "250 Nm", verbrauch: "6,0 l/100km" },
+            "Getriebe": { typ: "Automatik", gänge: 8, allrad: "Nein" },
+            "Fahrwerk": { federung: "Mehrlenker hinten", bremsen: "Scheibenbremse v/h", lenkung: "Servolenkung elektrisch" },
+            "Sicherheit": { airbags: 6, abs: "Ja", esp: "Ja", assistenzsysteme: "Abstandsregeltempomat" },
+            "Infotainment": { display: "8,8 Zoll", bluetooth: "Ja", navigationssystem: "Ja", soundanlage: "HiFi" },
+            "Extras": { panorama_dach: "Optional", sitzheizung: "Vorne & Hinten optional", led_scheinwerfer: "Ja", parkassistent: "Ja" }
+        }
+    },
+    {
+        id: 4,
+        marke: "Mercedes",
+        modell: "C200",
+        baujahr: 2019,
+        kraftstoff: "Diesel",
+        ps: 160,
+        kategorien: {
+            "Karosserie": { länge: "4686 mm", breite: "1810 mm", höhe: "1442 mm", türen: 4, sitze: 5 },
+            "Motor": { hubraum: "1950 ccm", zylinder: 4, ps: 160, drehmoment: "360 Nm", verbrauch: "4,8 l/100km" },
+            "Getriebe": { typ: "Automatik", gänge: 9, allrad: "Nein" },
+            "Fahrwerk": { federung: "Mehrlenker hinten", bremsen: "Scheibenbremse v/h", lenkung: "Servolenkung elektrisch" },
+            "Sicherheit": { airbags: 6, abs: "Ja", esp: "Ja", assistenzsysteme: "Spurhalteassistent, Totwinkelwarner" },
+            "Infotainment": { display: "10,25 Zoll", bluetooth: "Ja", navigationssystem: "Ja", soundanlage: "Burmester" },
+            "Extras": { panorama_dach: "Ja", sitzheizung: "Vorne & Hinten", led_scheinwerfer: "Ja", parkassistent: "Ja" }
+        }
+    },
+    {
+        id: 5,
+        marke: "Audi",
+        modell: "Q5",
+        baujahr: 2020,
+        kraftstoff: "Benzin",
+        ps: 249,
+        kategorien: {
+            "Karosserie": { länge: "4663 mm", breite: "1898 mm", höhe: "1659 mm", türen: 5, sitze: 5 },
+            "Motor": { hubraum: "1984 ccm", zylinder: 4, ps: 249, drehmoment: "370 Nm", verbrauch: "6,7 l/100km" },
+            "Getriebe": { typ: "Automatik", gänge: 7, allrad: "Quattro" },
+            "Fahrwerk": { federung: "Mehrlenker hinten", bremsen: "Scheibenbremse v/h", lenkung: "Servolenkung elektrisch" },
+            "Sicherheit": { airbags: 6, abs: "Ja", esp: "Ja", assistenzsysteme: "Abstandsregeltempomat, Spurhalteassistent" },
+            "Infotainment": { display: "10,1 Zoll", bluetooth: "Ja", navigationssystem: "Ja", soundanlage: "Bang & Olufsen" },
+            "Extras": { panorama_dach: "Ja", sitzheizung: "Vorne & Hinten", led_scheinwerfer: "Ja", parkassistent: "Ja" }
+        }
+    },
+    {
+        id: 6,
+        marke: "VW",
+        modell: "Passat",
+        baujahr: 2018,
+        kraftstoff: "Diesel",
+        ps: 190,
+        kategorien: {
+            "Karosserie": { länge: "4767 mm", breite: "1832 mm", höhe: "1456 mm", türen: 4, sitze: 5 },
+            "Motor": { hubraum: "1968 ccm", zylinder: 4, ps: 190, drehmoment: "400 Nm", verbrauch: "5,1 l/100km" },
+            "Getriebe": { typ: "Automatik", gänge: 7, allrad: "Nein" },
+            "Fahrwerk": { federung: "Mehrlenker hinten", bremsen: "Scheibenbremse v/h", lenkung: "Servolenkung elektrisch" },
+            "Sicherheit": { airbags: 6, abs: "Ja", esp: "Ja", assistenzsysteme: "Spurhalteassistent, Notbremsassistent" },
+            "Infotainment": { display: "8 Zoll", bluetooth: "Ja", navigationssystem: "Ja", soundanlage: "Standard" },
+            "Extras": { panorama_dach: "Nein", sitzheizung: "Vorne optional", led_scheinwerfer: "Nein", parkassistent: "Ja" }
+        }
+    },
+    {
+        id: 7,
+        marke: "BMW",
+        modell: "X3",
+        baujahr: 2021,
+        kraftstoff: "Hybrid",
+        ps: 292,
+        kategorien: {
+            "Karosserie": { länge: "4710 mm", breite: "1891 mm", höhe: "1676 mm", türen: 5, sitze: 5 },
+            "Motor": { hubraum: "1998 ccm", zylinder: 4, ps: 292, drehmoment: "420 Nm", verbrauch: "5,8 l/100km" },
+            "Getriebe": { typ: "Automatik", gänge: 8, allrad: "xDrive" },
+            "Fahrwerk": { federung: "Mehrlenker hinten", bremsen: "Scheibenbremse v/h", lenkung: "Servolenkung elektrisch" },
+            "Sicherheit": { airbags: 6, abs: "Ja", esp: "Ja", assistenzsysteme: "Abstandsregeltempomat, Spurhalteassistent" },
+            "Infotainment": { display: "10,25 Zoll", bluetooth: "Ja", navigationssystem: "Ja", soundanlage: "Harman Kardon" },
+            "Extras": { panorama_dach: "Ja", sitzheizung: "Vorne & Hinten", led_scheinwerfer:
+
                 }
             }
         ];
