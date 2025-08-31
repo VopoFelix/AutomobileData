@@ -7,10 +7,11 @@
         body { font-family: Arial, sans-serif; margin:20px; background-color:#f0f0f5; }
         header { background-color:#333; color:white; padding:20px; text-align:center; }
         .filter-bar { background-color:white; padding:20px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-bottom:20px; }
-        select, button { padding:6px; }
+        input, button { padding:6px; }
         ul { list-style-type:none; padding:0; max-width:800px; margin:auto; }
         li { background-color:white; margin:10px 0; padding:15px; border-radius:8px; cursor:pointer; box-shadow:0 0 5px rgba(0,0,0,0.1); }
         li:hover { background-color:#e0e0ff; }
+        button.back { margin-bottom:20px; padding:10px 20px; cursor:pointer; display:block; }
     </style>
 </head>
 <body>
@@ -18,11 +19,21 @@
         <h1>Suchergebnisse</h1>
     </header>
 
+    <button class="back" onclick="window.history.back()">Zurück</button>
+
     <div class="filter-bar">
-        <select id="marke"><option value="">Marke</option></select>
-        <select id="modell"><option value="">Modell</option></select>
-        <select id="baujahr"><option value="">Baujahr</option></select>
-        <select id="kraftstoff"><option value="">Kraftstoffart</option></select>
+        <input list="markenList" id="marke" placeholder="Marke">
+        <datalist id="markenList"></datalist>
+
+        <input list="modelleList" id="modell" placeholder="Modell">
+        <datalist id="modelleList"></datalist>
+
+        <input list="baujahrList" id="baujahr" placeholder="Baujahr">
+        <datalist id="baujahrList"></datalist>
+
+        <input list="kraftstoffList" id="kraftstoff" placeholder="Kraftstoffart">
+        <datalist id="kraftstoffList"></datalist>
+
         <button id="filterBtn">Filtern</button>
     </div>
 
@@ -33,10 +44,16 @@
             let autos = [];
 
             const params = new URLSearchParams(window.location.search);
-            const markeSelect = document.getElementById('marke');
-            const modellSelect = document.getElementById('modell');
-            const baujahrSelect = document.getElementById('baujahr');
-            const kraftstoffSelect = document.getElementById('kraftstoff');
+            const markeInput = document.getElementById('marke');
+            const modellInput = document.getElementById('modell');
+            const baujahrInput = document.getElementById('baujahr');
+            const kraftstoffInput = document.getElementById('kraftstoff');
+
+            const markenList = document.getElementById('markenList');
+            const modelleList = document.getElementById('modelleList');
+            const baujahrList = document.getElementById('baujahrList');
+            const kraftstoffList = document.getElementById('kraftstoffList');
+
             const resultsUl = document.getElementById('results');
             const filterBtn = document.getElementById('filterBtn');
 
@@ -45,62 +62,48 @@
                 .then(data => {
                     autos = data;
 
-                    populateMarkenDropdown();
+                    populateDatalists();
                     applyInitialParams();
                     renderResults();
                 })
                 .catch(err => console.error("Fehler beim Laden von autos.json:", err));
 
-            function populateMarkenDropdown() {
+            function populateDatalists() {
+                // Marken
                 const marken = Array.from(new Set(autos.map(a => a.marke))).sort();
-                marken.forEach(m => markeSelect.add(new Option(m, m)));
-            }
-
-            function populateDependentDropdowns() {
-                const selectedMarke = markeSelect.value;
-                const filteredAutos = selectedMarke ? autos.filter(a => a.marke === selectedMarke) : autos;
+                marken.forEach(m => markenList.appendChild(new Option(m)));
 
                 // Modelle
-                modellSelect.innerHTML = '<option value="">Modell</option>';
-                Array.from(new Set(filteredAutos.map(a => a.modell))).sort().forEach(m => modellSelect.add(new Option(m, m)));
+                const modelle = Array.from(new Set(autos.map(a => a.modell))).sort();
+                modelle.forEach(m => modelleList.appendChild(new Option(m)));
 
                 // Baujahr
-                baujahrSelect.innerHTML = '<option value="">Baujahr</option>';
-                Array.from(new Set(filteredAutos.map(a => a.baujahr))).sort((a,b)=>a-b).forEach(bj => baujahrSelect.add(new Option(bj, bj)));
+                const baujahre = Array.from(new Set(autos.map(a => a.baujahr))).sort((a,b)=>a-b);
+                baujahre.forEach(b => baujahrList.appendChild(new Option(b)));
 
                 // Kraftstoff
-                kraftstoffSelect.innerHTML = '<option value="">Kraftstoffart</option>';
-                Array.from(new Set(filteredAutos.map(a => a.kraftstoff).filter(k => k))).sort().forEach(k => kraftstoffSelect.add(new Option(k, k)));
+                const kraftstoffe = Array.from(new Set(autos.map(a => a.kraftstoff).filter(k => k))).sort();
+                kraftstoffe.forEach(k => kraftstoffList.appendChild(new Option(k)));
             }
 
-            markeSelect.addEventListener('change', () => {
-                populateDependentDropdowns();
-            });
-
             function applyInitialParams() {
-                const markeParam = params.get('marke') || "";
-                const modellParam = params.get('modell') || "";
-                const baujahrParam = params.get('baujahr') || "";
-                const kraftstoffParam = params.get('kraftstoff') || "";
-
-                markeSelect.value = markeParam;
-                populateDependentDropdowns();
-                modellSelect.value = modellParam;
-                baujahrSelect.value = baujahrParam;
-                kraftstoffSelect.value = kraftstoffParam;
+                markeInput.value = params.get('marke') || '';
+                modellInput.value = params.get('modell') || '';
+                baujahrInput.value = params.get('baujahr') || '';
+                kraftstoffInput.value = params.get('kraftstoff') || '';
             }
 
             function renderResults() {
-                const marke = markeSelect.value;
-                const modell = modellSelect.value;
-                const baujahr = baujahrSelect.value;
-                const kraftstoff = kraftstoffSelect.value;
+                const marke = markeInput.value;
+                const modell = modellInput.value;
+                const baujahr = baujahrInput.value;
+                const kraftstoff = kraftstoffInput.value;
 
                 const filtered = autos.filter(auto => {
-                    return (!marke || auto.marke === marke) &&
-                           (!modell || auto.modell === modell) &&
+                    return (!marke || auto.marke.toLowerCase() === marke.toLowerCase()) &&
+                           (!modell || auto.modell.toLowerCase() === modell.toLowerCase()) &&
                            (!baujahr || auto.baujahr == baujahr) &&
-                           (!kraftstoff || auto.kraftstoff === kraftstoff);
+                           (!kraftstoff || auto.kraftstoff.toLowerCase() === kraftstoff.toLowerCase());
                 });
 
                 resultsUl.innerHTML = '';
