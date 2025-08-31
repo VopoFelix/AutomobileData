@@ -23,72 +23,77 @@
         <select id="modell"><option value="">Modell</option></select>
         <select id="baujahr"><option value="">Baujahr</option></select>
         <select id="kraftstoff"><option value="">Kraftstoffart</option></select>
-        <button onclick="searchAuto()">Suchen</button>
+        <button id="searchBtn">Suchen</button>
     </div>
 
     <div class="brands-grid" id="brandsGrid"></div>
 
     <script>
-        let autos = [];
+        document.addEventListener('DOMContentLoaded', () => {
+            let autos = [];
 
-        fetch('autos.json')
-            .then(response => response.json())
-            .then(data => {
-                autos = data;
-                populateMarken();
-                populateBrandsGrid();
+            const markeSelect = document.getElementById('marke');
+            const modellSelect = document.getElementById('modell');
+            const baujahrSelect = document.getElementById('baujahr');
+            const kraftstoffSelect = document.getElementById('kraftstoff');
+            const brandsGrid = document.getElementById('brandsGrid');
+            const searchBtn = document.getElementById('searchBtn');
+
+            // JSON-Daten laden
+            fetch('autos.json')
+                .then(response => response.json())
+                .then(data => {
+                    autos = data;
+                    populateMarkenDropdown();
+                    populateBrandsGrid();
+                })
+                .catch(err => console.error("Fehler beim Laden von autos.json:", err));
+
+            function populateMarkenDropdown() {
+                const marken = Array.from(new Set(autos.map(a => a.marke))).sort();
+                marken.forEach(m => markeSelect.add(new Option(m, m)));
+            }
+
+            markeSelect.addEventListener('change', () => {
+                const selectedMarke = markeSelect.value;
+                const filteredAutos = selectedMarke ? autos.filter(a => a.marke === selectedMarke) : autos;
+
+                // Modelle
+                modellSelect.innerHTML = '<option value="">Modell</option>';
+                Array.from(new Set(filteredAutos.map(a => a.modell))).sort().forEach(m => modellSelect.add(new Option(m, m)));
+
+                // Baujahr
+                baujahrSelect.innerHTML = '<option value="">Baujahr</option>';
+                Array.from(new Set(filteredAutos.map(a => a.baujahr))).sort((a,b)=>a-b).forEach(bj => baujahrSelect.add(new Option(bj, bj)));
+
+                // Kraftstoff
+                kraftstoffSelect.innerHTML = '<option value="">Kraftstoffart</option>';
+                Array.from(new Set(filteredAutos.map(a => a.kraftstoff).filter(k => k))).sort().forEach(k => kraftstoffSelect.add(new Option(k, k)));
             });
 
-        const markeSelect = document.getElementById('marke');
-        const modellSelect = document.getElementById('modell');
-        const baujahrSelect = document.getElementById('baujahr');
-        const kraftstoffSelect = document.getElementById('kraftstoff');
+            function populateBrandsGrid() {
+                const brands = Array.from(new Set(autos.map(a => a.marke))).sort();
+                brands.forEach(brand => {
+                    const div = document.createElement('div');
+                    div.className = 'brand';
+                    div.textContent = brand;
+                    div.onclick = () => {
+                        window.location.href = 'results.html?marke=' + encodeURIComponent(brand);
+                    };
+                    brandsGrid.appendChild(div);
+                });
+            }
 
-        // Marken laden
-        function populateMarken() {
-            const markenSet = new Set(autos.map(a=>a.marke));
-            markenSet.forEach(m => markeSelect.add(new Option(m,m)));
-        }
-
-        // Wenn Marke ausgewählt wird → Modelle, Baujahr, Kraftstoff dynamisch anpassen
-        markeSelect.addEventListener('change', () => {
-            const selectedMarke = markeSelect.value;
-            const filteredAutos = selectedMarke ? autos.filter(a => a.marke === selectedMarke) : autos;
-
-            // Modelle
-            modellSelect.innerHTML = '<option value="">Modell</option>';
-            Array.from(new Set(filteredAutos.map(a=>a.modell))).forEach(m => modellSelect.add(new Option(m,m)));
-
-            // Baujahr
-            baujahrSelect.innerHTML = '<option value="">Baujahr</option>';
-            Array.from(new Set(filteredAutos.map(a=>a.baujahr))).sort((a,b)=>a-b).forEach(bj => baujahrSelect.add(new Option(bj,bj)));
-
-            // Kraftstoff
-            kraftstoffSelect.innerHTML = '<option value="">Kraftstoffart</option>';
-            Array.from(new Set(filteredAutos.map(a=>a.kraftstoff).filter(k=>k))).forEach(k => kraftstoffSelect.add(new Option(k,k)));
+            searchBtn.addEventListener('click', () => {
+                const params = new URLSearchParams({
+                    marke: markeSelect.value,
+                    modell: modellSelect.value,
+                    baujahr: baujahrSelect.value,
+                    kraftstoff: kraftstoffSelect.value
+                });
+                window.location.href = 'results.html?' + params.toString();
+            });
         });
-
-        function populateBrandsGrid() {
-            const brands = Array.from(new Set(autos.map(a=>a.marke)));
-            const grid = document.getElementById('brandsGrid');
-            brands.forEach(brand => {
-                const div = document.createElement('div');
-                div.className = 'brand';
-                div.textContent = brand;
-                div.onclick = () => window.location.href = 'results.html?marke=' + encodeURIComponent(brand);
-                grid.appendChild(div);
-            });
-        }
-
-        function searchAuto() {
-            const params = new URLSearchParams({
-                marke: markeSelect.value,
-                modell: modellSelect.value,
-                baujahr: baujahrSelect.value,
-                kraftstoff: kraftstoffSelect.value
-            });
-            window.location.href = 'results.html?' + params.toString();
-        }
     </script>
 </body>
 </html>
