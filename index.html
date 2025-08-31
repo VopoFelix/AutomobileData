@@ -7,7 +7,7 @@
         body { font-family: Arial, sans-serif; margin:0; background-color:#f0f0f5; }
         header { background-color:#333; color:white; padding:20px; text-align:center; }
         .search-bar { background-color:white; padding:20px; display:flex; justify-content:center; gap:10px; flex-wrap:wrap; margin-top:10px; }
-        select, button { padding:6px; }
+        input, button { padding:6px; }
         .brands-grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap:20px; margin:30px; }
         .brand { background-color:white; padding:20px; text-align:center; border-radius:8px; cursor:pointer; box-shadow:0 0 5px rgba(0,0,0,0.1); }
         .brand:hover { background-color:#e0e0ff; }
@@ -19,10 +19,18 @@
     </header>
 
     <div class="search-bar">
-        <select id="marke"><option value="">Marke</option></select>
-        <select id="modell"><option value="">Modell</option></select>
-        <select id="baujahr"><option value="">Baujahr</option></select>
-        <select id="kraftstoff"><option value="">Kraftstoffart</option></select>
+        <input list="markenList" id="marke" placeholder="Marke">
+        <datalist id="markenList"></datalist>
+
+        <input list="modelleList" id="modell" placeholder="Modell">
+        <datalist id="modelleList"></datalist>
+
+        <input list="baujahrList" id="baujahr" placeholder="Baujahr">
+        <datalist id="baujahrList"></datalist>
+
+        <input list="kraftstoffList" id="kraftstoff" placeholder="Kraftstoffart">
+        <datalist id="kraftstoffList"></datalist>
+
         <button id="searchBtn">Suchen</button>
     </div>
 
@@ -32,44 +40,45 @@
         document.addEventListener('DOMContentLoaded', () => {
             let autos = [];
 
-            const markeSelect = document.getElementById('marke');
-            const modellSelect = document.getElementById('modell');
-            const baujahrSelect = document.getElementById('baujahr');
-            const kraftstoffSelect = document.getElementById('kraftstoff');
+            const markeInput = document.getElementById('marke');
+            const modellInput = document.getElementById('modell');
+            const baujahrInput = document.getElementById('baujahr');
+            const kraftstoffInput = document.getElementById('kraftstoff');
+
+            const markenList = document.getElementById('markenList');
+            const modelleList = document.getElementById('modelleList');
+            const baujahrList = document.getElementById('baujahrList');
+            const kraftstoffList = document.getElementById('kraftstoffList');
+
             const brandsGrid = document.getElementById('brandsGrid');
             const searchBtn = document.getElementById('searchBtn');
 
-            // JSON-Daten laden
             fetch('autos.json')
                 .then(response => response.json())
                 .then(data => {
                     autos = data;
-                    populateMarkenDropdown();
+                    populateDatalists();
                     populateBrandsGrid();
                 })
                 .catch(err => console.error("Fehler beim Laden von autos.json:", err));
 
-            function populateMarkenDropdown() {
+            function populateDatalists() {
+                // Marken
                 const marken = Array.from(new Set(autos.map(a => a.marke))).sort();
-                marken.forEach(m => markeSelect.add(new Option(m, m)));
-            }
-
-            markeSelect.addEventListener('change', () => {
-                const selectedMarke = markeSelect.value;
-                const filteredAutos = selectedMarke ? autos.filter(a => a.marke === selectedMarke) : autos;
+                marken.forEach(m => markenList.appendChild(new Option(m)));
 
                 // Modelle
-                modellSelect.innerHTML = '<option value="">Modell</option>';
-                Array.from(new Set(filteredAutos.map(a => a.modell))).sort().forEach(m => modellSelect.add(new Option(m, m)));
+                const modelle = Array.from(new Set(autos.map(a => a.modell))).sort();
+                modelle.forEach(m => modelleList.appendChild(new Option(m)));
 
-                // Baujahr
-                baujahrSelect.innerHTML = '<option value="">Baujahr</option>';
-                Array.from(new Set(filteredAutos.map(a => a.baujahr))).sort((a,b)=>a-b).forEach(bj => baujahrSelect.add(new Option(bj, bj)));
+                // Baujahre
+                const baujahre = Array.from(new Set(autos.map(a => a.baujahr))).sort((a,b)=>a-b);
+                baujahre.forEach(b => baujahrList.appendChild(new Option(b)));
 
-                // Kraftstoff
-                kraftstoffSelect.innerHTML = '<option value="">Kraftstoffart</option>';
-                Array.from(new Set(filteredAutos.map(a => a.kraftstoff).filter(k => k))).sort().forEach(k => kraftstoffSelect.add(new Option(k, k)));
-            });
+                // Kraftstoffarten
+                const kraftstoffe = Array.from(new Set(autos.map(a => a.kraftstoff).filter(k => k))).sort();
+                kraftstoffe.forEach(k => kraftstoffList.appendChild(new Option(k)));
+            }
 
             function populateBrandsGrid() {
                 const brands = Array.from(new Set(autos.map(a => a.marke))).sort();
@@ -86,10 +95,10 @@
 
             searchBtn.addEventListener('click', () => {
                 const params = new URLSearchParams({
-                    marke: markeSelect.value,
-                    modell: modellSelect.value,
-                    baujahr: baujahrSelect.value,
-                    kraftstoff: kraftstoffSelect.value
+                    marke: markeInput.value,
+                    modell: modellInput.value,
+                    baujahr: baujahrInput.value,
+                    kraftstoff: kraftstoffInput.value
                 });
                 window.location.href = 'results.html?' + params.toString();
             });
