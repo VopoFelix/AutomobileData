@@ -3,10 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Auto-Details</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin:20px; background-color:#f0f0f5; }
+        header { background-color:#333; color:white; padding:20px; text-align:center; }
+        .details { max-width:600px; margin:auto; background-color:white; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+        .details p { margin:10px 0; }
+        button { margin-top:20px; padding:10px 20px; cursor:pointer; display:block; margin-left:auto; margin-right:auto; }
+    </style>
 </head>
 <body>
-    <h1>Auto-Details</h1>
-    <div id="details"></div>
+    <header>
+        <h1>Auto-Details</h1>
+    </header>
+
+    <div class="details" id="details"></div>
     <button onclick="window.history.back()">Zurück</button>
 
     <script>
@@ -22,9 +32,10 @@
                         <p><strong>Marke:</strong> ${auto.marke}</p>
                         <p><strong>Modell:</strong> ${auto.modell}</p>
                         <p><strong>Baujahr:</strong> ${auto.baujahr}</p>
-                        <p><strong>PS:</strong> ${auto.ps}</p>
-                        <p><strong>Verbrauch:</strong> ${auto.verbrauch}</p>
-                        <p><strong>Motor:</strong> ${auto.motor}</p>
+                        <p><strong>PS:</strong> ${auto.ps ? auto.ps : '-'}</p>
+                        <p><strong>Kraftstoff:</strong> ${auto.kraftstoff ? auto.kraftstoff : '-'}</p>
+                        <p><strong>Verbrauch:</strong> ${auto.verbrauch ? auto.verbrauch : '-'}</p>
+                        <p><strong>Motor:</strong> ${auto.motor ? auto.motor : '-'}</p>
                     `;
                 } else {
                     document.getElementById('details').innerHTML = '<p>Auto nicht gefunden</p>';
