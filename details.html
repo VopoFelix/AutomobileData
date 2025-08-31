@@ -4,14 +4,16 @@
 <meta charset="UTF-8">
 <title>Autodetails</title>
 <style>
-    body { font-family: Arial, sans-serif; margin:20px; background-color:#f0f0f5; }
-    header { background-color:#333; color:white; padding:20px; text-align:center; }
-    .container { max-width:800px; margin:auto; background-color:white; padding:20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-    .back { display:block; margin:20px auto; padding:10px 20px; cursor:pointer; }
-    .details-grid { display:grid; grid-template-columns: 1fr 2fr; gap:10px; margin-top:20px; }
-    .details-grid div { padding:5px 0; }
-    .image-container { text-align:center; margin-bottom:20px; }
-    .image-container img { max-width:100%; height:auto; border-radius:8px; }
+body { font-family: Arial, sans-serif; margin:20px; background-color:#f0f0f5; }
+header { background-color:#333; color:white; padding:20px; text-align:center; }
+.container { max-width:800px; margin:auto; background-color:white; padding:20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+.back { display:block; margin:20px auto; padding:10px 20px; cursor:pointer; }
+.category { margin-bottom:20px; }
+.category h2 { background-color:#e0e0ff; padding:10px; border-radius:5px; }
+.details-grid { display:grid; grid-template-columns: 1fr 2fr; gap:10px; margin-top:10px; }
+.details-grid div { padding:5px 0; }
+.image-container { text-align:center; margin-bottom:20px; }
+.image-container img { max-width:100%; height:auto; border-radius:8px; }
 </style>
 </head>
 <body>
@@ -24,15 +26,54 @@
         <img id="autoBild" src="" alt="Auto Bild" />
     </div>
 
-    <div class="details-grid">
-        <div>Marke:</div><div id="marke"></div>
-        <div>Modell:</div><div id="modell"></div>
-        <div>Baujahr:</div><div id="baujahr"></div>
-        <div>Kraftstoff:</div><div id="kraftstoff"></div>
-        <div>PS:</div><div id="ps"></div>
-        <div>Verbrauch:</div><div id="verbrauch"></div>
-        <div>Motor:</div><div id="motor"></div>
-        <!-- weitere Felder können hier ergänzt werden -->
+    <!-- Basisdaten -->
+    <div class="category">
+        <h2>Basisdaten</h2>
+        <div class="details-grid">
+            <div>Marke:</div><div id="marke"></div>
+            <div>Modell:</div><div id="modell"></div>
+            <div>Baujahr:</div><div id="baujahr"></div>
+            <div>Kraftstoff:</div><div id="kraftstoff"></div>
+        </div>
+    </div>
+
+    <!-- Karosserie -->
+    <div class="category">
+        <h2>Karosserie</h2>
+        <div class="details-grid">
+            <div>Länge:</div><div id="laenge"></div>
+            <div>Breite:</div><div id="breite"></div>
+            <div>Höhe:</div><div id="hoehe"></div>
+            <div>Gewicht:</div><div id="gewicht"></div>
+        </div>
+    </div>
+
+    <!-- Motor -->
+    <div class="category">
+        <h2>Motor</h2>
+        <div class="details-grid">
+            <div>PS:</div><div id="ps"></div>
+            <div>Hubraum:</div><div id="hubraum"></div>
+            <div>Verbrauch:</div><div id="verbrauch"></div>
+            <div>Motorart:</div><div id="motorart"></div>
+        </div>
+    </div>
+
+    <!-- Getriebe -->
+    <div class="category">
+        <h2>Getriebe</h2>
+        <div class="details-grid">
+            <div>Getriebeart:</div><div id="getriebeart"></div>
+            <div>Gänge:</div><div id="gaenge"></div>
+        </div>
+    </div>
+
+    <!-- Extras -->
+    <div class="category">
+        <h2>Extras</h2>
+        <div class="details-grid">
+            <div>Besonderheiten:</div><div id="extras"></div>
+        </div>
     </div>
 
     <button class="back" onclick="window.history.back()">Zurück</button>
@@ -52,20 +93,38 @@ document.addEventListener('DOMContentLoaded', () => {
                 return;
             }
 
-            // Werte einfügen
+            // Basisdaten
             document.getElementById('marke').textContent = auto.marke || '-';
             document.getElementById('modell').textContent = auto.modell || '-';
             document.getElementById('baujahr').textContent = auto.baujahr || '-';
             document.getElementById('kraftstoff').textContent = auto.kraftstoff || '-';
-            document.getElementById('ps').textContent = auto.ps || '-';
-            document.getElementById('verbrauch').textContent = auto.verbrauch || '-';
-            document.getElementById('motor').textContent = auto.motor || '-';
 
-            // Bild einfügen (falls vorhanden)
+            // Karosserie
+            document.getElementById('laenge').textContent = auto.laenge || '-';
+            document.getElementById('breite').textContent = auto.breite || '-';
+            document.getElementById('hoehe').textContent = auto.hoehe || '-';
+            document.getElementById('gewicht').textContent = auto.gewicht || '-';
+
+            // Motor
+            document.getElementById('ps').textContent = auto.ps || '-';
+            document.getElementById('hubraum').textContent = auto.hubraum || '-';
+            document.getElementById('verbrauch').textContent = auto.verbrauch || '-';
+            document.getElementById('motorart').textContent = auto.motorart || '-';
+
+            // Getriebe
+            document.getElementById('getriebeart').textContent = auto.getriebeart || '-';
+            document.getElementById('gaenge').textContent = auto.gaenge || '-';
+
+            // Extras
+            document.getElementById('extras').textContent = auto.extras || '-';
+
+            // Bild
             const bild = document.getElementById('autoBild');
             if (auto.bild) {
                 bild.src = auto.bild;
+                bild.alt = `${auto.marke} ${auto.modell}`;
             } else {
+                bild.src = 'placeholder.jpg';
                 bild.alt = 'Kein Bild vorhanden';
             }
         })
