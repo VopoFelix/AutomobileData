@@ -1,46 +1,78 @@
 <!DOCTYPE html>
 <html lang="de">
 <head>
-    <meta charset="UTF-8">
-    <title>Auto-Details</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin:20px; background-color:#f0f0f5; }
-        header { background-color:#333; color:white; padding:20px; text-align:center; }
-        .details { max-width:600px; margin:auto; background-color:white; padding:20px; border-radius:10px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
-        .details p { margin:10px 0; }
-        button { margin-top:20px; padding:10px 20px; cursor:pointer; display:block; margin-left:auto; margin-right:auto; }
-    </style>
+<meta charset="UTF-8">
+<title>Autodetails</title>
+<style>
+    body { font-family: Arial, sans-serif; margin:20px; background-color:#f0f0f5; }
+    header { background-color:#333; color:white; padding:20px; text-align:center; }
+    .container { max-width:800px; margin:auto; background-color:white; padding:20px; border-radius:8px; box-shadow:0 0 10px rgba(0,0,0,0.1); }
+    .back { display:block; margin:20px auto; padding:10px 20px; cursor:pointer; }
+    .details-grid { display:grid; grid-template-columns: 1fr 2fr; gap:10px; margin-top:20px; }
+    .details-grid div { padding:5px 0; }
+    .image-container { text-align:center; margin-bottom:20px; }
+    .image-container img { max-width:100%; height:auto; border-radius:8px; }
+</style>
 </head>
 <body>
-    <header>
-        <h1>Auto-Details</h1>
-    </header>
+<header>
+    <h1>Autodetails</h1>
+</header>
 
-    <div class="details" id="details"></div>
-    <button onclick="window.history.back()">Zurück</button>
+<div class="container">
+    <div class="image-container">
+        <img id="autoBild" src="" alt="Auto Bild" />
+    </div>
 
-    <script>
-        const params = new URLSearchParams(window.location.search);
-        const id = params.get('id');
+    <div class="details-grid">
+        <div>Marke:</div><div id="marke"></div>
+        <div>Modell:</div><div id="modell"></div>
+        <div>Baujahr:</div><div id="baujahr"></div>
+        <div>Kraftstoff:</div><div id="kraftstoff"></div>
+        <div>PS:</div><div id="ps"></div>
+        <div>Verbrauch:</div><div id="verbrauch"></div>
+        <div>Motor:</div><div id="motor"></div>
+        <!-- weitere Felder können hier ergänzt werden -->
+    </div>
 
-        fetch('autos.json')
-            .then(response => response.json())
-            .then(autos => {
-                const auto = autos.find(a => a.id == id);
-                if(auto) {
-                    document.getElementById('details').innerHTML = `
-                        <p><strong>Marke:</strong> ${auto.marke}</p>
-                        <p><strong>Modell:</strong> ${auto.modell}</p>
-                        <p><strong>Baujahr:</strong> ${auto.baujahr}</p>
-                        <p><strong>PS:</strong> ${auto.ps ? auto.ps : '-'}</p>
-                        <p><strong>Kraftstoff:</strong> ${auto.kraftstoff ? auto.kraftstoff : '-'}</p>
-                        <p><strong>Verbrauch:</strong> ${auto.verbrauch ? auto.verbrauch : '-'}</p>
-                        <p><strong>Motor:</strong> ${auto.motor ? auto.motor : '-'}</p>
-                    `;
-                } else {
-                    document.getElementById('details').innerHTML = '<p>Auto nicht gefunden</p>';
-                }
-            });
-    </script>
+    <button class="back" onclick="window.history.back()">Zurück</button>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const autoId = params.get('id');
+
+    fetch('autos.json')
+        .then(response => response.json())
+        .then(autos => {
+            const auto = autos.find(a => a.id == autoId);
+            if (!auto) {
+                alert("Auto nicht gefunden");
+                return;
+            }
+
+            // Werte einfügen
+            document.getElementById('marke').textContent = auto.marke || '-';
+            document.getElementById('modell').textContent = auto.modell || '-';
+            document.getElementById('baujahr').textContent = auto.baujahr || '-';
+            document.getElementById('kraftstoff').textContent = auto.kraftstoff || '-';
+            document.getElementById('ps').textContent = auto.ps || '-';
+            document.getElementById('verbrauch').textContent = auto.verbrauch || '-';
+            document.getElementById('motor').textContent = auto.motor || '-';
+
+            // Bild einfügen (falls vorhanden)
+            const bild = document.getElementById('autoBild');
+            if (auto.bild) {
+                bild.src = auto.bild;
+                bild.alt = `${auto.marke} ${auto.modell}`;
+            } else {
+                bild.src = 'placeholder.jpg'; // Platzhalter-Bild
+                bild.alt = 'Kein Bild vorhanden';
+            }
+        })
+        .catch(err => console.error("Fehler beim Laden von autos.json:", err));
+});
+</script>
 </body>
 </html>
