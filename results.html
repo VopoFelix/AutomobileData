@@ -3,9 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>Suchergebnisse</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin:20px; background-color:#f0f0f5; }
+        header { background-color:#333; color:white; padding:20px; text-align:center; }
+        h1 { text-align:center; }
+        ul { list-style-type:none; padding:0; max-width:600px; margin:auto; }
+        li { background-color:white; margin:10px 0; padding:15px; border-radius:8px; cursor:pointer; box-shadow:0 0 5px rgba(0,0,0,0.1); }
+        li:hover { background-color:#e0e0ff; }
+    </style>
 </head>
 <body>
-    <h1>Suchergebnisse</h1>
+    <header>
+        <h1>Suchergebnisse</h1>
+    </header>
+
     <ul id="results"></ul>
 
     <script>
@@ -13,7 +24,7 @@
         const marke = params.get('marke');
         const modell = params.get('modell');
         const baujahr = params.get('baujahr');
-        const ps = params.get('ps');
+        const kraftstoff = params.get('kraftstoff');
 
         fetch('autos.json')
             .then(response => response.json())
@@ -22,7 +33,7 @@
                     return (!marke || auto.marke.toLowerCase().includes(marke.toLowerCase()))
                         && (!modell || auto.modell.toLowerCase().includes(modell.toLowerCase()))
                         && (!baujahr || auto.baujahr == baujahr)
-                        && (!ps || auto.ps == ps);
+                        && (!kraftstoff || auto.kraftstoff && auto.kraftstoff.toLowerCase().includes(kraftstoff.toLowerCase()));
                 });
 
                 const ul = document.getElementById('results');
